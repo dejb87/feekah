@@ -140,25 +140,33 @@ function jokeOffsetForToday(count) {
 
 /* -------------------------- Daylight -------------------------- */
 
-function DaylightMeter({ progress, compact = false }) {
-  const t = Math.min(1, Math.max(0, progress));
+const lerp = (a, b, u) => a + (b - a) * u;
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+/* Smoothstep, so the collapse eases in and out of itself instead of tracking
+   the scroll wheel linearly — linear interpolation reads as mechanical. */
+const ease = (u) => u * u * (3 - 2 * u);
 
-  /* The collapsed band is a SHALLOWER DRAWING, not a scaled-down one.
-     An SVG with a fixed pixel height and a taller viewBox gets letterboxed:
-     the browser fits the whole viewBox inside the box, so a 400x112 drawing in
-     a 672x56 slot renders at scale 0.5 — 200px wide, centred, with empty
-     gutters either side. Setting no pixel height and giving the compact state
-     its own short geometry lets height follow width, so the band always spans
-     the full column and stays proportional on any screen. */
+/**
+ * `collapse` is a CONTINUOUS 0→1 morph, not a boolean.
+ *
+ * It used to be a `stuck` flag flipped at a scroll threshold, which meant two
+ * entirely different drawings swapped in one frame — clouds vanishing, hills
+ * changing shape, the viewBox jumping. Even with hysteresis to stop it
+ * chattering, the switch itself was a visible pop. Interpolating every
+ * dimension against one eased value means there is no switch to see, and
+ * hysteresis becomes unnecessary: there is no state to flip.
+ */
+function DaylightMeter({ progress, collapse }) {
+  const t = clamp01(progress);
+  const c = clamp01(collapse);
+
   const w = 400;
-  const h = compact ? 46 : 130;
-  const groundY = compact ? 32 : h - 30;
-  const arcHeight = compact ? 20 : 72;
-
-  /* The sun must scale WITH the drawing. Its radii used to be fixed, so the
-     glow was 12% of the full 130-unit sky but 47% of the collapsed band — it
-     swallowed the sky, which is why the background vanished when collapsed. */
-  const k = compact ? 0.42 : 1;
+  const h = lerp(130, 46, c);
+  const groundY = lerp(100, 32, c);
+  const arcHeight = lerp(72, 20, c);
+  // The sun scales WITH the drawing. Fixed radii made the glow 12% of the full
+  // sky but 47% of the collapsed band, where it swallowed the sky entirely.
+  const k = lerp(1, 0.42, c);
 
   const x = 22 + t * (w - 44);
   const y = groundY - Math.sin(t * Math.PI) * arcHeight;
@@ -166,6 +174,18 @@ function DaylightMeter({ progress, compact = false }) {
   // sky blends dawn → day → dusk as the reader moves through the edition
   const dawnOpacity = Math.max(0, 1 - t * 2);
   const duskOpacity = Math.max(0, t * 2 - 1);
+  // Clouds fade out rather than unmounting — a pop is exactly what we removed.
+  const cloudOpacity = 1 - c;
+
+  /* Hills are expressed as FRACTIONS of h, so one set of paths works at every
+     height. Absolute offsets (h - 60) went negative once h shrank below 60 and
+     the ridge shot off the top of the viewBox. */
+  const backHill =
+    `M0,${h} L0,${h - 0.26 * h} Q ${w * 0.22},${h - 0.46 * h} ${w * 0.42},${h - 0.31 * h}` +
+    ` T ${w * 0.78},${h - 0.35 * h} Q ${w * 0.9},${h - 0.38 * h} ${w},${h - 0.28 * h} L ${w},${h} Z`;
+  const frontHill =
+    `M0,${h} L0,${h - 0.11 * h} Q ${w * 0.18},${h - 0.31 * h} ${w * 0.38},${h - 0.15 * h}` +
+    ` T ${w * 0.7},${h - 0.18 * h} Q ${w * 0.88},${h - 0.23 * h} ${w},${h - 0.09 * h} L ${w},${h} Z`;
 
   return (
     <div className="relative w-full">
@@ -173,25 +193,26 @@ function DaylightMeter({ progress, compact = false }) {
         /* Pulse via opacity + scale, NOT the r attribute. Animating SVG geometry
            properties like r in CSS is unsupported in Firefox, where the glow
            simply never breathes; opacity and transform animate everywhere. */
-        @keyframes fika-glow   { 0%,100% { opacity: .16; transform: scale(1); }
-                                 50%     { opacity: .30; transform: scale(1.2); } }
-        @keyframes fika-rays   { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes fika-drift  { from { transform: translateX(-5px); } to { transform: translateX(5px); } }
+        @keyframes fika-glow  { 0%,100% { opacity: .16; transform: scale(1); }
+                                50%     { opacity: .30; transform: scale(1.2); } }
+        @keyframes fika-rays  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes fika-drift { from { transform: translateX(-6px); } to { transform: translateX(6px); } }
+        @keyframes fika-twinkle { 0%,100% { opacity: .15; } 50% { opacity: .55; } }
         .fika-glow  { animation: fika-glow 4.5s ease-in-out infinite;
                       transform-box: fill-box; transform-origin: center; }
         .fika-rays  { animation: fika-rays 120s linear infinite;
                       transform-box: fill-box; transform-origin: center; }
-        .fika-cloud { animation: fika-drift 11s ease-in-out infinite alternate; }
-        .fika-sun   { transition: transform .5s cubic-bezier(.22,.61,.36,1); }
+        .fika-cloud { animation: fika-drift 13s ease-in-out infinite alternate; }
+        .fika-star  { animation: fika-twinkle 3.5s ease-in-out infinite; }
       `}</style>
       <svg
         viewBox={`0 0 ${w} ${h}`}
         className="w-full block"
         // aspect-ratio matches the viewBox exactly, so the drawing always fills
-        // the full width with no letterboxing, and height stays proportional on
-        // any screen. Transitioning the ratio animates the collapse; browsers
-        // that won't animate it simply snap, which is a fine fallback.
-        style={{ aspectRatio: `${w} / ${h}`, transition: "aspect-ratio .35s cubic-bezier(.22,.61,.36,1)" }}
+        // the full width with no letterboxing. No CSS transition on it: the
+        // value is already changing smoothly with scroll, and a transition on
+        // top would lag behind the finger.
+        style={{ aspectRatio: `${w} / ${h}` }}
         aria-hidden="true"
       >
         <defs>
@@ -218,8 +239,37 @@ function DaylightMeter({ progress, compact = false }) {
         <rect width={w} height={h} fill="url(#fika-sky-dawn)" opacity={dawnOpacity} />
         <rect width={w} height={h} fill="url(#fika-sky-dusk)" opacity={duskOpacity} />
 
+        {/* First stars, only near the end of the edition and only at full size.
+            The reward for finishing, not decoration. */}
+        {duskOpacity > 0.15 && cloudOpacity > 0.4 && (
+          <g fill={C.paper} opacity={duskOpacity * cloudOpacity}>
+            {[[62, 0.17], [128, 0.11], [196, 0.2], [268, 0.13], [330, 0.18]].map(([sx, sy], i) => (
+              <circle
+                key={sx}
+                className="fika-star"
+                cx={sx}
+                cy={h * sy}
+                r={1.5}
+                style={{ animationDelay: `${i * 0.7}s` }}
+              />
+            ))}
+          </g>
+        )}
+
+        {cloudOpacity > 0.02 && (
+          <g opacity={cloudOpacity}>
+            <g opacity="0.5" className="fika-cloud">
+              <ellipse cx={w * 0.2} cy={h * 0.26} rx="24" ry="6" fill={C.paper} />
+              <ellipse cx={w * 0.18} cy={h * 0.22} rx="15" ry="5" fill={C.paper} />
+            </g>
+            <g opacity="0.4" className="fika-cloud" style={{ animationDelay: "-6s" }}>
+              <ellipse cx={w * 0.75} cy={h * 0.18} rx="19" ry="5" fill={C.paper} />
+            </g>
+          </g>
+        )}
+
         {/* sun sits behind the hills, so it rises out of and sets into them */}
-        <g className="fika-sun" style={{ transform: `translate(${x}px, ${y}px)` }}>
+        <g style={{ transform: `translate(${x}px, ${y}px)` }}>
           <circle className="fika-glow" r={16 * k} fill={C.amber} opacity="0.18" />
           <g className="fika-rays" stroke={C.amber} strokeWidth={1.4 * k} strokeLinecap="round" opacity="0.45">
             {[0, 45, 90, 135].map((deg) => (
@@ -230,42 +280,75 @@ function DaylightMeter({ progress, compact = false }) {
           <circle r={5.5 * k} fill={C.amber} />
         </g>
 
-        {/* Clouds need sky to drift through; the collapsed band has none. */}
-        {!compact && (
-          <>
-            <g opacity="0.5" className="fika-cloud">
-              <ellipse cx={w * 0.2} cy={h * 0.26} rx="24" ry="6" fill={C.paper} />
-              <ellipse cx={w * 0.18} cy={h * 0.22} rx="15" ry="5" fill={C.paper} />
-            </g>
-            <g opacity="0.4" className="fika-cloud" style={{ animationDelay: "-5s" }}>
-              <ellipse cx={w * 0.75} cy={h * 0.18} rx="19" ry="5" fill={C.paper} />
-            </g>
-          </>
-        )}
-
-        {/* Rolling hills — two layers for depth at full size, one shallow ridge
-            when collapsed, so the sun still rises out of and sets into land. */}
-        {compact ? (
-          <path
-            d={`M0,${h} L0,${h - 5} Q ${w * 0.25},${h - 12} ${w * 0.5},${h - 7}
-                T ${w},${h - 6} L ${w},${h} Z`}
-            fill={C.ink} opacity="0.9"
-          />
-        ) : (
-          <>
-            <path
-              d={`M0,${h} L0,${h - 34} Q ${w * 0.22},${h - 60} ${w * 0.42},${h - 40}
-                  T ${w * 0.78},${h - 46} Q ${w * 0.9},${h - 50} ${w},${h - 36} L ${w},${h} Z`}
-              fill={C.moss} opacity="0.3"
-            />
-            <path
-              d={`M0,${h} L0,${h - 14} Q ${w * 0.18},${h - 40} ${w * 0.38},${h - 20}
-                  T ${w * 0.7},${h - 24} Q ${w * 0.88},${h - 30} ${w},${h - 12} L ${w},${h} Z`}
-              fill={C.ink} opacity="0.92"
-            />
-          </>
-        )}
+        <path d={backHill} fill={C.moss} opacity="0.3" />
+        <path d={frontHill} fill={C.ink} opacity="0.92" />
       </svg>
+    </div>
+  );
+}
+
+/**
+ * Owns its own scroll state so the rest of the page doesn't re-render.
+ *
+ * Progress used to live in the App component, so every scroll event re-rendered
+ * all 24 story cards to move a sun a few pixels. Keeping it here means a scroll
+ * updates only this SVG. The listener is also rAF-throttled: scroll events can
+ * fire far more often than the screen refreshes, and doing layout reads on each
+ * one is wasted work.
+ */
+function DaylightBand() {
+  const [progress, setProgress] = useState(0);
+  const [collapse, setCollapse] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      const el = document.documentElement;
+      const max = el.scrollHeight - el.clientHeight;
+      setProgress(max > 40 ? el.scrollTop / max : 0);
+      // Morph across a band of scroll rather than snapping at one point.
+      setCollapse(ease(clamp01((el.scrollTop - 120) / 130)));
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(read); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+
+    /* The page gets taller when the edition arrives and when topics are
+       toggled, and neither fires scroll or resize — so progress would stay
+       pinned to whatever the height was at mount. Watching the body catches
+       every content change without App having to tell us about it. */
+    // Guarded: ResizeObserver is absent in some environments (jsdom, older
+    // browsers), and an unguarded constructor throws hard enough to take the
+    // whole component down and render a blank page.
+    let ro = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(onScroll);
+      ro.observe(document.body);
+    }
+
+    read();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (ro) ro.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return (
+    <div
+      style={{
+        position: "sticky", top: 0, zIndex: 20,
+        background: C.paper,
+        marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20,
+        marginTop: 16,
+        boxShadow: collapse > 0.6 ? `0 6px 16px -12px ${C.ink}` : "none",
+        borderBottom: `1px solid ${collapse > 0.6 ? C.sky : "transparent"}`,
+        transition: "box-shadow .3s ease, border-color .3s ease",
+      }}
+    >
+      <DaylightMeter progress={progress} collapse={collapse} />
     </div>
   );
 }
@@ -279,8 +362,6 @@ export default function Feekah() {
   const [extraLangs, setExtraLangs] = useState([]);   // other editions to borrow from
   const [extraEditions, setExtraEditions] = useState({});
   const [status, setStatus] = useState("idle"); // idle | loading | done | error
-  const [progress, setProgress] = useState(0);
-  const [stuck, setStuck] = useState(false);
   const [jokeIdx, setJokeIdx] = useState(0);
   const [jokeShown, setJokeShown] = useState(false);
 
@@ -349,23 +430,9 @@ export default function Feekah() {
     return acc;
   }, {});
 
-  /* scroll → daylight */
-  useEffect(() => {
-    const onScroll = () => {
-      const el = document.documentElement;
-      const max = el.scrollHeight - el.clientHeight;
-      setProgress(max > 40 ? el.scrollTop / max : 0);
-      /* Hysteresis, not a bare threshold. Collapsing at exactly one scroll
-         position means resting near it flips between two entirely different
-         drawings on every scroll event — which reads as the whole thing
-         glitching. Collapse at 220, expand again only below 130, so the states
-         cannot chatter at the boundary. */
-      setStuck((was) => (was ? el.scrollTop > 130 : el.scrollTop > 220));
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [stories.length]);
+  /* Scroll state lives in DaylightBand, not here — see the note on that
+     component. Keeping it in App meant every scroll event re-rendered all 24
+     story cards to move the sun a few pixels. */
 
   const load = useCallback(async () => {
     if (!topics.length) return;
@@ -498,19 +565,7 @@ export default function Feekah() {
             full-height page column: `position: sticky` is constrained to its
             containing block, so while this lived inside <header> it unstuck and
             vanished the moment the header's own short box scrolled past. */}
-        <div
-          style={{
-            position: "sticky", top: 0, zIndex: 20,
-            background: C.paper,
-            marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20,
-            marginTop: 16,
-            boxShadow: stuck ? `0 6px 16px -12px ${C.ink}` : "none",
-            borderBottom: `1px solid ${stuck ? C.sky : "transparent"}`,
-            transition: "box-shadow .35s ease, border-color .35s ease",
-          }}
-        >
-          <DaylightMeter progress={progress} compact={stuck} />
-        </div>
+        <DaylightBand />
 
         {/* ---------- Topics ---------- */}
         <section className="mt-7">
