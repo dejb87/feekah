@@ -1,0 +1,26 @@
+name: Daily rebuild
+
+# feekah's editions are built at deploy time by Vercel (npm run build runs
+# build-edition.mjs first), so this workflow's only job is to ask Vercel for a
+# fresh deploy each morning. Nothing is fetched or committed here.
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC — ~04:00/05:00 Oslo, before anyone's coffee
+  workflow_dispatch: # lets you trigger a rebuild by hand from the Actions tab
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask Vercel to rebuild
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK secret is not set — add it in"
+            echo "Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          # --fail so an HTTP error fails the job rather than passing silently.
+          curl --fail --silent --show-error -X POST "$HOOK"
+          echo "Rebuild requested."

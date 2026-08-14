@@ -1,0 +1,36 @@
+{
+  "_readme": "Static dad jokes, rotated daily by the app. Written natively per language, never translated — a pun built on Norwegian wordplay dies the moment you move it into English. Add your own freely; the app picks a starting joke from the date, so a longer list means a longer time before anyone sees a repeat. Keep them clean and child-safe: nothing about politics, religion, or anyone's appearance.",
+
+  "no": [
+    { "setup": "Kva kallar du ein bumerang som ikkje kjem tilbake?", "punchline": "Ein pinne." },
+    { "setup": "Hvorfor er fisker så flinke til å veie seg?", "punchline": "De har sin egen skala." },
+    { "setup": "Hva er det beste med å bo i Bergen?", "punchline": "Du vasker aldri bilen forgjeves." },
+    { "setup": "Hvorfor tok Ole med seg stigen på jobb?", "punchline": "Han skulle jobbe på et høyere nivå." },
+    { "setup": "Hva sa det ene vindet til det andre?", "punchline": "Ingenting. Det bare blåste i det." },
+    { "setup": "Hvorfor ble kaka lei seg?", "punchline": "Den følte seg helt smuldret opp." },
+    { "setup": "Hva kaller du en snømann om sommeren?", "punchline": "En dam med god selvtillit." },
+    { "setup": "Hvorfor gikk klokka til legen?", "punchline": "Den hadde vondt i visere." }
+  ],
+
+  "sv": [
+    { "setup": "Vad kallar man en bumerang som inte kommer tillbaka?", "punchline": "En pinne." },
+    { "setup": "Varför är fiskar så bra på att väga sig?", "punchline": "De har egna vågar." },
+    { "setup": "Varför gick tomaten och la sig?", "punchline": "Den var helt mosad." },
+    { "setup": "Vad sa den ena väggen till den andra?", "punchline": "Vi ses i hörnet!" },
+    { "setup": "Varför tog Kalle med sig stegen till jobbet?", "punchline": "Han skulle jobba på en högre nivå." },
+    { "setup": "Vad kallar man en björn utan öron?", "punchline": "B." },
+    { "setup": "Varför blev brödet ledsen?", "punchline": "Det kände sig lite skivat." },
+    { "setup": "Vad gör en ko när solen går ner?", "punchline": "Den blir mörkrädd — den ser inte en flen." }
+  ],
+
+  "en": [
+    { "setup": "What do you call a boomerang that doesn't come back?", "punchline": "A stick." },
+    { "setup": "Why did the scarecrow win an award?", "punchline": "He was outstanding in his field." },
+    { "setup": "I only know 25 letters of the alphabet.", "punchline": "I don't know y." },
+    { "setup": "What do you call cheese that isn't yours?", "punchline": "Nacho cheese." },
+    { "setup": "How do you organise a party in space?", "punchline": "You planet." },
+    { "setup": "Why don't skeletons ever fight each other?", "punchline": "They don't have the guts." },
+    { "setup": "What did the ocean say to the shore?", "punchline": "Nothing. It just waved." },
+    { "setup": "Why did the bicycle fall over?", "punchline": "It was two tired." }
+  ]
+}

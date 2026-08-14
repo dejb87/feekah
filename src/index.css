@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* The component paints its own palette inline; this just stops the browser's
+   default margin fighting the layout. */
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
