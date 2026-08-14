@@ -137,7 +137,7 @@ function jokeOffsetForToday(count) {
 
 /* -------------------------- Daylight -------------------------- */
 
-function DaylightMeter({ progress }) {
+function DaylightMeter({ progress, compact = false }) {
   const w = 400, h = 130;
   const t = Math.min(1, Math.max(0, progress));
 
@@ -161,7 +161,14 @@ function DaylightMeter({ progress }) {
         .fika-cloud { animation: fika-drift 11s ease-in-out infinite alternate; }
         .fika-sun   { transition: transform .5s cubic-bezier(.22,.61,.36,1); }
       `}</style>
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-28" aria-hidden="true">
+      {/* Collapsed, the viewBox crops to the band the sun actually travels
+          through, so the arc keeps its full sweep instead of being squashed. */}
+      <svg
+        viewBox={compact ? `0 ${groundY - arcHeight - 22} ${w} ${arcHeight + 40}` : `0 0 ${w} ${h}`}
+        className="w-full"
+        style={{ height: compact ? 56 : 112, transition: "height .35s cubic-bezier(.22,.61,.36,1)" }}
+        aria-hidden="true"
+      >
         <defs>
           <linearGradient id="fika-sky-day" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={C.sky} />
@@ -232,6 +239,7 @@ export default function Feekah() {
   const [extraEditions, setExtraEditions] = useState({});
   const [status, setStatus] = useState("idle"); // idle | loading | done | error
   const [progress, setProgress] = useState(0);
+  const [stuck, setStuck] = useState(false);
   const [jokeIdx, setJokeIdx] = useState(0);
   const [jokeShown, setJokeShown] = useState(false);
 
@@ -303,6 +311,8 @@ export default function Feekah() {
       const el = document.documentElement;
       const max = el.scrollHeight - el.clientHeight;
       setProgress(max > 40 ? el.scrollTop / max : 0);
+      // Past the masthead and tagline — collapse the sun into its sticky band.
+      setStuck(el.scrollTop > 180);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -418,7 +428,23 @@ export default function Feekah() {
           </div>
 
           <div className="mt-4">
-            <DaylightMeter progress={progress} />
+            <div style={{ height: stuck ? 56 : 0, transition: "height .35s cubic-bezier(.22,.61,.36,1)" }} />
+            {/* The sun is the reading progress, so it earns its place at the top
+                rather than scrolling away with the masthead. It collapses to a
+                slim band once you're past the intro, keeping the arc visible
+                without eating the screen you're reading with. */}
+            <div
+              style={{
+                position: "sticky", top: 0, zIndex: 20,
+                background: C.paper,
+                marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20,
+                boxShadow: stuck ? `0 6px 16px -12px ${C.ink}` : "none",
+                borderBottom: `1px solid ${stuck ? C.sky : "transparent"}`,
+                transition: "box-shadow .35s ease, border-color .35s ease",
+              }}
+            >
+              <DaylightMeter progress={progress} compact={stuck} />
+            </div>
             <div style={{ fontFamily: MONO, fontSize: 11, color: C.soft, marginTop: 2 }}>{today}</div>
           </div>
         </header>
