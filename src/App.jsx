@@ -266,6 +266,37 @@ export default function Feekah() {
     catch (e) { /* prefs just won't persist */ }
   }, [lang, topics, extraLangs]);
 
+  /* ---- Derived state ----
+     These must be declared BEFORE any effect whose dependency array reads them.
+     `stories` used to be useState([]) at the top of the component; turning it
+     into derived state computed after the merge left the scroll effect below
+     reaching backwards into the temporal dead zone, which threw
+     "Cannot access before initialization" and rendered a blank page. */
+
+  // Switching the interface to a language you'd also picked as supplementary
+  // would otherwise merge an edition with itself.
+  const borrowed = extraLangs.filter((l) => l !== lang);
+  const pool = [
+    ...(edition?.stories || []),
+    ...borrowed.flatMap((l) => extraEditions[l]?.stories || []),
+  ];
+  const cap = edition?.maxPerTopic ?? 8;
+  const seenPerTopic = {};
+  const available = pool.filter((s) => {
+    const n = (seenPerTopic[s.topic] || 0) + 1;
+    seenPerTopic[s.topic] = n;
+    return n <= cap;
+  });
+
+  const stories = available.filter((s) => topics.includes(s.topic));
+
+  // Counts must describe what's actually reachable, including borrowed stories,
+  // or a chip reads 0 while holding items.
+  const counts = available.reduce((acc, s) => {
+    acc[s.topic] = (acc[s.topic] || 0) + 1;
+    return acc;
+  }, {});
+
   /* scroll → daylight */
   useEffect(() => {
     const onScroll = () => {
@@ -334,30 +365,6 @@ export default function Feekah() {
      across the merged set. That fills a topic the home edition has nothing for
      (Norwegian has no nature sources) without padding one it already fills —
      the toggle is there to close gaps, not to double the length of the read. */
-  // Switching the interface to a language you'd also selected as supplementary
-  // would otherwise merge an edition with itself.
-  const borrowed = extraLangs.filter((l) => l !== lang);
-  const pool = [
-    ...(edition?.stories || []),
-    ...borrowed.flatMap((l) => extraEditions[l]?.stories || []),
-  ];
-  const cap = edition?.maxPerTopic ?? 8;
-  const seenPerTopic = {};
-  const available = pool.filter((s) => {
-    const n = (seenPerTopic[s.topic] || 0) + 1;
-    seenPerTopic[s.topic] = n;
-    return n <= cap;
-  });
-
-  const stories = available.filter((s) => topics.includes(s.topic));
-
-  // Counts must describe what's actually reachable, including borrowed stories,
-  // or a chip reads 0 while holding items.
-  const counts = available.reduce((acc, s) => {
-    acc[s.topic] = (acc[s.topic] || 0) + 1;
-    return acc;
-  }, {});
-
   const toggleExtraLang = (id) =>
     setExtraLangs((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 

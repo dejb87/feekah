@@ -10,7 +10,8 @@
     "build:app": "vite build",
     "preview": "vite preview",
     "editions": "node build-edition.mjs",
-    "validate": "node validate-feeds.mjs"
+    "validate": "node validate-feeds.mjs",
+    "smoke": "node smoke-test.mjs"
   },
   "engines": {
     "node": "22.x"
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.11",
     "@vitejs/plugin-react": "^5.0.0",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4.1.11",
     "vite": "^7.0.0"
   }
