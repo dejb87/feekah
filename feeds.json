@@ -1,5 +1,5 @@
 {
-  "_readme": "feekah source list. 'topic' must match a topic id in the app: family, health, nature, science, kindness, culture, humor. 'tier' decides how hard an item has to work to get in — see _howItWorks. Run 'node validate-feeds.mjs' to check everything, '--write' to save status back here.",
+  "_readme": "feekah source list. 'topic' must match a topic id in the app: family, health, nature, science, kindness, culture, wonder. 'tier' decides how hard an item has to work to get in — see _howItWorks. Run 'node validate-feeds.mjs' to check everything, '--write' to save status back here.",
   "_howItWorks": {
     "tier1": "Pre-filtered sources. Someone else already decided this outlet publishes constructive news. An item is included unless the blocklist catches it. This is a light safety net, not the main filter.",
     "tier2": "General news wires. No editorial filter upstream, so the logic is inverted: an item must EARN inclusion, either by carrying a category in 'categoryAllow' or by matching a word in 'require'. Anything that clears neither bar is dropped. Order of evidence, strongest first: sectionBlock (the URL's own section) → categoryBlock (the publisher's own tag) → block (title keywords) → categoryAllow or require. Publisher metadata beats keyword guessing every time and should always be preferred where a feed provides it. Far fewer items survive, and the failure mode becomes 'boring' rather than 'a conviction for abusing a child' — which is the trade you want for a calm morning read.",
@@ -8,7 +8,8 @@
     "require": "Tier 2 only. Positive signal, matched against the title. KEEP TOPIC NOUNS OUT OF THIS LIST. The first live run proved the rule: every leak came from a topic noun and none from an action word. 'skog' admitted a house fire ('Villa i skogen brann') and a forest-fire story ('skogsbränder'); 'festival' admitted a piece about teenage drinking; 'lösning' admitted one about drug scenes; 'musikk' admitted a funding withdrawal. A topic noun says what a story is ABOUT, which is exactly the thing that carries no sentiment — 'skog' appears in both a woodland-restoration story and a wildfire. Only verbs and outcomes belong here: räddar, hjälper, firar, oppdaget, breakthrough. Honest limitation even then: keyword matching is a blunt instrument for sentiment, and it kills good stories as readily as bad ones. NOTE: an LLM classifier is NOT an option — feekah must stay AI-free at fetch time, consuming no tokens per day. So when tier 2 underperforms, the fix is better publisher metadata (categoryAllow, sectionBlock) or a narrower section feed URL — never a model. On the first run with categories wired in, tier 2 went from 0 usable Norwegian items to 13.",
     "dedup": "The validator drops cross-source duplicates within each edition, by normalised title and by canonical URL. VG and Aftenposten are both Schibsted and genuinely do run the same story.",
     "matchMode": "'substring' for Norwegian and Swedish, 'word' for English. Norwegian and Swedish compound their nouns, so a blocked stem often sits at the END of a word — 'tarmkreft', 'brannvesen', 'riksdagsval' — and word-boundary matching sails straight past it. English does not compound and needs the boundary, or 'dead' swallows 'deadline'. The cost of substring mode is that short stems collide: bare 'val' in Swedish matches val (whale), valp, valross and kvalitet, so the lists below use 'riksdagsval' and 'valrörelse' instead. Keep NO/SV entries at four characters or more and check them against a compound before adding.",
-    "topicRules": "Topic per ITEM, not per source. Matched as whole tokens against the item's categories AND the first segment of its URL, which on Labrador sites (forskning.no, ung.forskning.no, sciencenorway.no) is the article's hyphen-joined tag list — those three publish no <category> at all, so the slug is the only signal they give. Whole-token matching matters: substring matching would let 'mat' (food) match 'matematikk'. FIRST MATCH WINS, so order is meaningful and deliberately not alphabetical — 'family' sits above 'nature' so a story tagged barn-og-ungdom-klima-mat reads as family rather than climate, and 'science' sits near the bottom so a science site's archaeology piece lands in culture instead of defaulting back to science. Anything matching nothing falls back to the source's own topic."
+    "topicRules": "Topic per ITEM, not per source. Matched as whole tokens against the item's categories AND the first segment of its URL, which on Labrador sites (forskning.no, ung.forskning.no, sciencenorway.no) is the article's hyphen-joined tag list — those three publish no <category> at all, so the slug is the only signal they give. Whole-token matching matters: substring matching would let 'mat' (food) match 'matematikk'. FIRST MATCH WINS, so order is meaningful and deliberately not alphabetical — 'family' sits above 'nature' so a story tagged barn-og-ungdom-klima-mat reads as family rather than climate, and 'science' sits near the bottom so a science site's archaeology piece lands in culture instead of defaulting back to science. Anything matching nothing falls back to the source's own topic.",
+    "wonder": "The 'wonder' topic replaced 'humor'. There is no reliable warm-funny news feed in ANY of the three languages — UPI's Odd News wire, the closest thing to one, led with a teenager's death the day it was probed, and Norwegian and Swedish have nothing at all. Comedy in feekah lives in the dad-joke card instead, which is curated in src/jokes.json and entirely under your control. This chip covers what the sources genuinely deliver: the odd, the record-breaking and the delightful. Its rules run FIRST but deliberately contain only oddity markers (rart, udda, unusual, mystery, record) and NOT broad topic nouns — putting 'arkeologi' here would strip every archaeology story out of culture rather than catching the overflow."
   },
   "no": {
     "label": "Norsk",
@@ -253,13 +254,31 @@
       "oppskrift"
     ],
     "topicRules": {
-      "humor": [
-        "humor",
-        "kuriosa",
-        "rart",
+      "wonder": [
         "rare",
+        "rart",
+        "rar",
+        "merkelig",
+        "merkelege",
+        "uvanlig",
+        "uvanleg",
+        "kuriosa",
+        "mysterium",
+        "gåte",
+        "rekord",
+        "oppsiktsvekkende",
+        "sjeldne",
+        "sjelden",
+        "forbløffende",
+        "utrolig",
         "morsomste",
-        "kurios"
+        "morsom",
+        "morsomt",
+        "artig",
+        "artige",
+        "snodig",
+        "pussig",
+        "fascinerende"
       ],
       "family": [
         "familie",
@@ -522,11 +541,26 @@
       "recept"
     ],
     "topicRules": {
-      "humor": [
-        "humor",
-        "kuriosa",
+      "wonder": [
         "udda",
-        "roligt"
+        "konstig",
+        "konstiga",
+        "ovanlig",
+        "ovanliga",
+        "kuriosa",
+        "mysterium",
+        "gåta",
+        "rekord",
+        "sällsynt",
+        "häpnadsväckande",
+        "otrolig",
+        "roligaste",
+        "lustig",
+        "lustiga",
+        "skoj",
+        "fascinerande",
+        "märklig",
+        "märkliga"
       ],
       "family": [
         "familj",
@@ -676,16 +710,16 @@
         "id": "atlas-obscura",
         "name": "Atlas Obscura",
         "url": "https://www.atlasobscura.com/feeds/latest",
-        "topic": "humor",
+        "topic": "wonder",
         "tier": 1,
         "status": "ok",
-        "note": "Curious places, odd history, delightful footnotes. Feeds the humor/oddities chip without being a joke site."
+        "note": "Curious places, odd history, delightful footnotes. Feeds the 'wonder' chip (odd & curious) — it is not a joke site, and the chip no longer claims to be funny."
       },
       {
         "id": "oddity-central",
         "name": "Oddity Central",
         "url": "https://www.odditycentral.com/feed",
-        "topic": "humor",
+        "topic": "wonder",
         "tier": 1,
         "status": "ok",
         "note": "Weird-but-true. Tier 1 but watch it: 'oddity' sometimes means grim rather than funny, so the blocklist is doing real work here. Check its samples after each run."
@@ -791,15 +825,25 @@
       "recipe"
     ],
     "topicRules": {
-      "humor": [
+      "wonder": [
         "oddity",
         "oddities",
+        "odd",
         "weird",
         "strange",
         "curious",
-        "funny",
+        "curiosity",
         "bizarre",
-        "quirky"
+        "quirky",
+        "unusual",
+        "mystery",
+        "mysterious",
+        "unexplained",
+        "record",
+        "rare",
+        "remarkable",
+        "astonishing",
+        "unexpected"
       ],
       "family": [
         "family",

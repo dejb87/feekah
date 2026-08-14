@@ -36,7 +36,10 @@ const TOPICS = [
   { id: "science", no: "Forskning", sv: "Forskning", en: "Science" },
   { id: "kindness", no: "Nærmiljø", sv: "Närsamhälle", en: "Community" },
   { id: "culture", no: "Kultur & sport", sv: "Kultur & sport", en: "Culture & sport" },
-  { id: "humor", no: "Humor & rare saker", sv: "Humor & udda nyheter", en: "Humour & oddities" },
+  // Not "humour": no reliable warm-funny feed exists in any of the three
+  // languages, so the chip promised a laugh the sources couldn't deliver.
+  // Comedy lives in the dad-joke card; this is the odd and the delightful.
+  { id: "wonder", no: "Rare saker", sv: "Udda saker", en: "Odd & curious" },
 ];
 
 const T = {
@@ -296,7 +299,10 @@ export default function Feekah() {
       if (raw) {
         const p = JSON.parse(raw);
         if (p.lang) setLang(p.lang);
-        if (Array.isArray(p.topics) && p.topics.length) setTopics(p.topics);
+        // "humor" was renamed to "wonder"; migrate saved selections rather than
+        // leaving anyone pointing at a topic that no longer exists.
+        const topics = (p.topics || []).map((t) => (t === "humor" ? "wonder" : t));
+        if (topics.length) setTopics(topics);
         if (Array.isArray(p.extraLangs)) setExtraLangs(p.extraLangs);
       }
     } catch (e) { /* first run, or storage disabled in this browser */ }
