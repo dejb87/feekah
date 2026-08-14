@@ -121,6 +121,15 @@
           "sport"
         ],
         "note": "No category tags at all, but the URL carries the section. A sample run was verden(7) sport(5) norge(5) meninger(4) e24(2) oslo(1) karriere(1) — so opinion, business and world news are blocked by section, leaving norge/oslo/karriere for the keyword gate. Much of Aftenposten is subscriber-only and RSS gives no way to detect it (see _paywall); readers will hit walls."
+      },
+      {
+        "id": "nrk-livsstil",
+        "name": "NRK Livsstil",
+        "url": "https://www.nrk.no/livsstil/toppsaker.rss",
+        "topic": "family",
+        "tier": 1,
+        "status": "ok",
+        "note": "Lifestyle and everyday life. Same shape as NRK Nyttig and squarely on the everyday-family brief."
       }
     ],
     "block": [
@@ -394,6 +403,15 @@
         "tier": 1,
         "status": "ok",
         "note": "Swedish nature and wildlife. Almost entirely positive by nature."
+      },
+      {
+        "id": "svt-vetenskap",
+        "name": "SVT Vetenskap",
+        "url": "https://www.svt.se/nyheter/vetenskap/rss.xml",
+        "topic": "science",
+        "tier": 1,
+        "status": "ok",
+        "note": "SVT's science section. Tier 1 for the same reason NRK Viten is: a science desk is pre-filtered in practice. Swedish had only two tier-1 sources before this."
       },
       {
         "id": "svt-vast",
@@ -671,6 +689,33 @@
         "tier": 1,
         "status": "ok",
         "note": "Weird-but-true. Tier 1 but watch it: 'oddity' sometimes means grim rather than funny, so the blocklist is doing real work here. Check its samples after each run."
+      },
+      {
+        "id": "good-good-good",
+        "name": "Good Good Good",
+        "url": "https://www.goodgoodgood.co/articles/rss.xml",
+        "topic": "kindness",
+        "tier": 1,
+        "status": "ok",
+        "note": "100 items, all with summaries. Constructive-journalism outlet, closest in spirit to Positive News and by far the largest clean English source found."
+      },
+      {
+        "id": "nice-news",
+        "name": "Nice News",
+        "url": "https://www.nicenews.com/feed/",
+        "topic": "kindness",
+        "tier": 1,
+        "status": "ok",
+        "note": "Daily positive digest. Small feed but consistently warm and well-summarised."
+      },
+      {
+        "id": "optimist-daily",
+        "name": "The Optimist Daily",
+        "url": "https://www.optimistdaily.com/feed/",
+        "topic": "science",
+        "tier": 1,
+        "status": "ok",
+        "note": "Solutions journalism, science-leaning. Per-item topic rules spread it across science, health and nature."
       }
     ],
     "block": [
@@ -893,7 +938,16 @@
     "en": [
       "Family & parenting",
       "Humour that isn't celebrity gossip"
-    ]
+    ],
+    "reviewed": {
+      "note": "Probed and deliberately NOT added — recorded so nobody re-probes them.",
+      "kurera.se": "Swedish health, 12 items, well-summarised and a perfect topical fit for the empty SV health chip — but it is a wellness publication that also runs alternative medicine. That collides with the 'no mumbo jumbo' rule, so it needs a human decision rather than a silent add.",
+      "svt konsument/inrikes": "Both alive and large (100 items each) but they are general news wires in disguise — the konsument feed's top item was an apartment fire. Would need tier 2, and SVT publishes no categories, so the gate would yield nothing.",
+      "sverigesnatur.org": "Alive, but it is an advocacy organisation and runs political campaigning ('Liberalerna blåljuger om klimatet'). SV nature is already full from Natursidan.",
+      "upi.com Odd News": "Alive with 25 items, but 'odd' includes deaths — the top item was a teenager's death. Confirms that odd-news wires are not warm-news wires.",
+      "dagbladet.no, bt.no, aftenposten A-magasinet": "All alive (Dagbladet is another Labrador site, ?lab_viewport=rss). All tabloid or paywalled general news; would need tier 2 with no metadata to gate on.",
+      "dead": "mabra.com, viforaldrar.se, land.se, illvet.se, allas.se, expressen leva-och-bo, sunnyskyz.com, nrk.no/mat — all 404/406."
+    }
   },
   "_policy": {
     "note": "Bounded reading is the product, not a performance tuning knob. feekah's sun arc fills as you scroll and ends at 'that's the good news for today'; an edition of 300 stories turns that ending into a lie and rebuilds the infinite scroll the app exists to avoid. maxPerTopic caps each topic separately rather than the edition overall, so a reader who picks one chip still gets a full read instead of whatever was left after a dominant topic ate the budget.",

@@ -138,11 +138,20 @@ function jokeOffsetForToday(count) {
 /* -------------------------- Daylight -------------------------- */
 
 function DaylightMeter({ progress, compact = false }) {
-  const w = 400, h = 130;
   const t = Math.min(1, Math.max(0, progress));
 
-  const groundY = h - 30;
-  const arcHeight = 72;
+  /* The collapsed band is a SHALLOWER DRAWING, not a scaled-down one.
+     An SVG with a fixed pixel height and a taller viewBox gets letterboxed:
+     the browser fits the whole viewBox inside the box, so a 400x112 drawing in
+     a 672x56 slot renders at scale 0.5 — 200px wide, centred, with empty
+     gutters either side. Setting no pixel height and giving the compact state
+     its own short geometry lets height follow width, so the band always spans
+     the full column and stays proportional on any screen. */
+  const w = 400;
+  const h = compact ? 34 : 130;
+  const groundY = compact ? 25 : h - 30;
+  const arcHeight = compact ? 17 : 72;
+
   const x = 22 + t * (w - 44);
   const y = groundY - Math.sin(t * Math.PI) * arcHeight;
 
@@ -153,20 +162,28 @@ function DaylightMeter({ progress, compact = false }) {
   return (
     <div className="relative w-full">
       <style>{`
-        @keyframes fika-glow   { 0%,100% { r: 15; opacity: .16; } 50% { r: 19; opacity: .26; } }
+        /* Pulse via opacity + scale, NOT the r attribute. Animating SVG geometry
+           properties like r in CSS is unsupported in Firefox, where the glow
+           simply never breathes; opacity and transform animate everywhere. */
+        @keyframes fika-glow   { 0%,100% { opacity: .16; transform: scale(1); }
+                                 50%     { opacity: .30; transform: scale(1.2); } }
         @keyframes fika-rays   { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes fika-drift  { from { transform: translateX(-5px); } to { transform: translateX(5px); } }
-        .fika-glow  { animation: fika-glow 4.5s ease-in-out infinite; }
-        .fika-rays  { animation: fika-rays 120s linear infinite; transform-origin: center; }
+        .fika-glow  { animation: fika-glow 4.5s ease-in-out infinite;
+                      transform-box: fill-box; transform-origin: center; }
+        .fika-rays  { animation: fika-rays 120s linear infinite;
+                      transform-box: fill-box; transform-origin: center; }
         .fika-cloud { animation: fika-drift 11s ease-in-out infinite alternate; }
         .fika-sun   { transition: transform .5s cubic-bezier(.22,.61,.36,1); }
       `}</style>
-      {/* Collapsed, the viewBox crops to the band the sun actually travels
-          through, so the arc keeps its full sweep instead of being squashed. */}
       <svg
-        viewBox={compact ? `0 ${groundY - arcHeight - 22} ${w} ${arcHeight + 40}` : `0 0 ${w} ${h}`}
-        className="w-full"
-        style={{ height: compact ? 56 : 112, transition: "height .35s cubic-bezier(.22,.61,.36,1)" }}
+        viewBox={`0 0 ${w} ${h}`}
+        className="w-full block"
+        // aspect-ratio matches the viewBox exactly, so the drawing always fills
+        // the full width with no letterboxing, and height stays proportional on
+        // any screen. Transitioning the ratio animates the collapse; browsers
+        // that won't animate it simply snap, which is a fine fallback.
+        style={{ aspectRatio: `${w} / ${h}`, transition: "aspect-ratio .35s cubic-bezier(.22,.61,.36,1)" }}
         aria-hidden="true"
       >
         <defs>
@@ -205,25 +222,41 @@ function DaylightMeter({ progress, compact = false }) {
           <circle r="5.5" fill={C.amber} />
         </g>
 
-        <g opacity="0.5" className="fika-cloud">
-          <ellipse cx={w * 0.2} cy={h * 0.26} rx="24" ry="6" fill={C.paper} />
-          <ellipse cx={w * 0.18} cy={h * 0.22} rx="15" ry="5" fill={C.paper} />
-        </g>
-        <g opacity="0.4" className="fika-cloud" style={{ animationDelay: "-5s" }}>
-          <ellipse cx={w * 0.75} cy={h * 0.18} rx="19" ry="5" fill={C.paper} />
-        </g>
+        {/* Clouds need sky to drift through; the collapsed band has none. */}
+        {!compact && (
+          <>
+            <g opacity="0.5" className="fika-cloud">
+              <ellipse cx={w * 0.2} cy={h * 0.26} rx="24" ry="6" fill={C.paper} />
+              <ellipse cx={w * 0.18} cy={h * 0.22} rx="15" ry="5" fill={C.paper} />
+            </g>
+            <g opacity="0.4" className="fika-cloud" style={{ animationDelay: "-5s" }}>
+              <ellipse cx={w * 0.75} cy={h * 0.18} rx="19" ry="5" fill={C.paper} />
+            </g>
+          </>
+        )}
 
-        {/* rolling hills, two layers for depth */}
-        <path
-          d={`M0,${h} L0,${h - 34} Q ${w * 0.22},${h - 60} ${w * 0.42},${h - 40}
-              T ${w * 0.78},${h - 46} Q ${w * 0.9},${h - 50} ${w},${h - 36} L ${w},${h} Z`}
-          fill={C.moss} opacity="0.3"
-        />
-        <path
-          d={`M0,${h} L0,${h - 14} Q ${w * 0.18},${h - 40} ${w * 0.38},${h - 20}
-              T ${w * 0.7},${h - 24} Q ${w * 0.88},${h - 30} ${w},${h - 12} L ${w},${h} Z`}
-          fill={C.ink} opacity="0.92"
-        />
+        {/* Rolling hills — two layers for depth at full size, one shallow ridge
+            when collapsed, so the sun still rises out of and sets into land. */}
+        {compact ? (
+          <path
+            d={`M0,${h} L0,${h - 5} Q ${w * 0.25},${h - 12} ${w * 0.5},${h - 7}
+                T ${w},${h - 6} L ${w},${h} Z`}
+            fill={C.ink} opacity="0.9"
+          />
+        ) : (
+          <>
+            <path
+              d={`M0,${h} L0,${h - 34} Q ${w * 0.22},${h - 60} ${w * 0.42},${h - 40}
+                  T ${w * 0.78},${h - 46} Q ${w * 0.9},${h - 50} ${w},${h - 36} L ${w},${h} Z`}
+              fill={C.moss} opacity="0.3"
+            />
+            <path
+              d={`M0,${h} L0,${h - 14} Q ${w * 0.18},${h - 40} ${w * 0.38},${h - 20}
+                  T ${w * 0.7},${h - 24} Q ${w * 0.88},${h - 30} ${w},${h - 12} L ${w},${h} Z`}
+              fill={C.ink} opacity="0.92"
+            />
+          </>
+        )}
       </svg>
     </div>
   );
