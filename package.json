@@ -12,6 +12,9 @@
     "editions": "node build-edition.mjs",
     "validate": "node validate-feeds.mjs"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
