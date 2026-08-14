@@ -29,7 +29,7 @@ for (const l of ["no", "sv", "en"]) {
 }
 
 const dom = new JSDOM(`<!doctype html><html><body><div id="root"></div></body></html>`, {
-  url: "https://feekah.vercel.app/",
+  url: "https://feekah.no/",
   runScripts: "outside-only",
   pretendToBeVisual: true,
 });
