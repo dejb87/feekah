@@ -427,27 +427,27 @@ export default function Feekah() {
             </div>
           </div>
 
-          <div className="mt-4">
-            <div style={{ height: stuck ? 56 : 0, transition: "height .35s cubic-bezier(.22,.61,.36,1)" }} />
-            {/* The sun is the reading progress, so it earns its place at the top
-                rather than scrolling away with the masthead. It collapses to a
-                slim band once you're past the intro, keeping the arc visible
-                without eating the screen you're reading with. */}
-            <div
-              style={{
-                position: "sticky", top: 0, zIndex: 20,
-                background: C.paper,
-                marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20,
-                boxShadow: stuck ? `0 6px 16px -12px ${C.ink}` : "none",
-                borderBottom: `1px solid ${stuck ? C.sky : "transparent"}`,
-                transition: "box-shadow .35s ease, border-color .35s ease",
-              }}
-            >
-              <DaylightMeter progress={progress} compact={stuck} />
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 11, color: C.soft, marginTop: 2 }}>{today}</div>
-          </div>
+          <div style={{ fontFamily: MONO, fontSize: 11, color: C.soft, marginTop: 14 }}>{today}</div>
         </header>
+
+        {/* The sun is the reading progress, so it stays in view rather than
+            scrolling away with the masthead. It MUST be a direct child of the
+            full-height page column: `position: sticky` is constrained to its
+            containing block, so while this lived inside <header> it unstuck and
+            vanished the moment the header's own short box scrolled past. */}
+        <div
+          style={{
+            position: "sticky", top: 0, zIndex: 20,
+            background: C.paper,
+            marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20,
+            marginTop: 16,
+            boxShadow: stuck ? `0 6px 16px -12px ${C.ink}` : "none",
+            borderBottom: `1px solid ${stuck ? C.sky : "transparent"}`,
+            transition: "box-shadow .35s ease, border-color .35s ease",
+          }}
+        >
+          <DaylightMeter progress={progress} compact={stuck} />
+        </div>
 
         {/* ---------- Topics ---------- */}
         <section className="mt-7">

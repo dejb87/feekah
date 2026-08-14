@@ -71,6 +71,13 @@ if (!text.includes("feekah")) fail.push("wordmark missing from render");
 // is broken even though the shell rendered.
 if (!w.document.querySelector("article")) fail.push("no <article> cards rendered — stories never reached the page");
 
+// `position: sticky` is constrained to its containing block, so the sun must
+// live in the full-height page column. Nested inside <header> it unsticks and
+// disappears as soon as the header's own short box scrolls past.
+const sticky = [...w.document.querySelectorAll("div")].find((d) => d.style.position === "sticky");
+if (!sticky) fail.push("sticky sun container missing");
+else if (sticky.closest("header")) fail.push("sticky sun is inside <header> — it will unstick when the header scrolls away");
+
 if (fail.length) {
   realConsole.error("\nSMOKE TEST FAILED");
   fail.forEach((f) => realConsole.error("  ✗ " + f));
