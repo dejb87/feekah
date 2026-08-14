@@ -47,8 +47,6 @@ const T = {
     eyebrow: "DAGENS PAUSE",
     tagline: "Gode nyheter til kaffekoppen. Ingen politikk, ingen reklame.",
     pick: "Velg det du vil lese om",
-    load: "Hent dagens nyheter",
-    reload: "Hent på nytt",
     loading: "Leter etter lyspunkter …",
     more: "Les mer",
     end: "Det var dagens fika.",
@@ -56,11 +54,13 @@ const T = {
     emptyTopics: "Velg minst ett tema for å komme i gang.",
     emptyTopic: "Ingen saker i denne utgaven",
     alsoShow: "Vis også saker på",
+    selectAll: "Velg alle",
+    clearAll: "Fjern alle",
+    newEdition: "Ny utgave er klar — hent den",
     errTitle: "Fikk ikke tak i nyhetene",
     errBody: "Nettet svarte ikke. Prøv igjen om et øyeblikk.",
     retry: "Prøv igjen",
     source: "Kilde",
-    open: "Åpne saken",
     noResults: "Fant ingenting nytt akkurat nå. Prøv flere temaer.",
     jokeLabel: "DAGENS PAPPAVITS",
     jokeReveal: "Vis svaret",
@@ -70,8 +70,6 @@ const T = {
     eyebrow: "DAGENS FIKA",
     tagline: "Goda nyheter till kaffekoppen. Ingen politik, ingen reklam.",
     pick: "Välj vad du vill läsa om",
-    load: "Hämta dagens nyheter",
-    reload: "Hämta på nytt",
     loading: "Letar efter ljuspunkter …",
     more: "Läs mer",
     end: "Det var dagens fika.",
@@ -79,11 +77,13 @@ const T = {
     emptyTopics: "Välj minst ett ämne för att börja.",
     emptyTopic: "Inga artiklar i dagens utgåva",
     alsoShow: "Visa även artiklar på",
+    selectAll: "Välj alla",
+    clearAll: "Rensa",
+    newEdition: "Ny utgåva finns — hämta den",
     errTitle: "Kunde inte hämta nyheterna",
     errBody: "Nätet svarade inte. Försök igen om en stund.",
     retry: "Försök igen",
     source: "Källa",
-    open: "Öppna artikeln",
     noResults: "Hittade inget nytt just nu. Prova fler ämnen.",
     jokeLabel: "DAGENS PAPPASKÄMT",
     jokeReveal: "Visa svaret",
@@ -93,8 +93,6 @@ const T = {
     eyebrow: "TODAY'S BREAK",
     tagline: "Good news with your coffee. No politics, no ads.",
     pick: "Pick what you want to read about",
-    load: "Get today's news",
-    reload: "Get new stories",
     loading: "Looking for bright spots …",
     more: "Read more",
     end: "That's today's fika.",
@@ -102,11 +100,13 @@ const T = {
     emptyTopics: "Pick at least one topic to start.",
     emptyTopic: "Nothing in today's edition",
     alsoShow: "Also show stories in",
+    selectAll: "Select all",
+    clearAll: "Clear",
+    newEdition: "A new edition is ready — load it",
     errTitle: "Couldn't get the news",
     errBody: "The network didn't answer. Try again in a moment.",
     retry: "Try again",
     source: "Source",
-    open: "Open the article",
     noResults: "Nothing new turned up. Try adding topics.",
     jokeLabel: "TODAY'S DAD JOKE",
     jokeReveal: "Show the answer",
@@ -151,9 +151,14 @@ function DaylightMeter({ progress, compact = false }) {
      its own short geometry lets height follow width, so the band always spans
      the full column and stays proportional on any screen. */
   const w = 400;
-  const h = compact ? 34 : 130;
-  const groundY = compact ? 25 : h - 30;
-  const arcHeight = compact ? 17 : 72;
+  const h = compact ? 46 : 130;
+  const groundY = compact ? 32 : h - 30;
+  const arcHeight = compact ? 20 : 72;
+
+  /* The sun must scale WITH the drawing. Its radii used to be fixed, so the
+     glow was 12% of the full 130-unit sky but 47% of the collapsed band — it
+     swallowed the sky, which is why the background vanished when collapsed. */
+  const k = compact ? 0.42 : 1;
 
   const x = 22 + t * (w - 44);
   const y = groundY - Math.sin(t * Math.PI) * arcHeight;
@@ -215,14 +220,14 @@ function DaylightMeter({ progress, compact = false }) {
 
         {/* sun sits behind the hills, so it rises out of and sets into them */}
         <g className="fika-sun" style={{ transform: `translate(${x}px, ${y}px)` }}>
-          <circle className="fika-glow" r="16" fill={C.amber} opacity="0.18" />
-          <g className="fika-rays" stroke={C.amber} strokeWidth="1.4" strokeLinecap="round" opacity="0.45">
+          <circle className="fika-glow" r={16 * k} fill={C.amber} opacity="0.18" />
+          <g className="fika-rays" stroke={C.amber} strokeWidth={1.4 * k} strokeLinecap="round" opacity="0.45">
             {[0, 45, 90, 135].map((deg) => (
-              <line key={deg} x1="0" y1="-13" x2="0" y2="-17" transform={`rotate(${deg})`} />
+              <line key={deg} x1="0" y1={-13 * k} x2="0" y2={-17 * k} transform={`rotate(${deg})`} />
             ))}
           </g>
-          <circle r="8" fill="url(#fika-sun-core)" />
-          <circle r="5.5" fill={C.amber} />
+          <circle r={8 * k} fill="url(#fika-sun-core)" />
+          <circle r={5.5 * k} fill={C.amber} />
         </g>
 
         {/* Clouds need sky to drift through; the collapsed band has none. */}
@@ -350,8 +355,12 @@ export default function Feekah() {
       const el = document.documentElement;
       const max = el.scrollHeight - el.clientHeight;
       setProgress(max > 40 ? el.scrollTop / max : 0);
-      // Past the masthead and tagline — collapse the sun into its sticky band.
-      setStuck(el.scrollTop > 180);
+      /* Hysteresis, not a bare threshold. Collapsing at exactly one scroll
+         position means resting near it flips between two entirely different
+         drawings on every scroll event — which reads as the whole thing
+         glitching. Collapse at 220, expand again only below 130, so the states
+         cannot chatter at the boundary. */
+      setStuck((was) => (was ? el.scrollTop > 130 : el.scrollTop > 220));
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -416,6 +425,21 @@ export default function Feekah() {
      the toggle is there to close gaps, not to double the length of the read. */
   const toggleExtraLang = (id) =>
     setExtraLangs((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  // Only topics with stories count as "all" — an edition legitimately has
+  // nothing for some chips, and those are disabled.
+  /* True only when the edition on screen was built on an earlier day than the
+     one the reader is now in — a tab left open overnight. Compared as local
+     calendar days, since "today's paper" is a human notion, not a UTC one. */
+  const staleEdition = (() => {
+    if (!edition?.built) return false;
+    const built = new Date(edition.built), now = new Date();
+    return built.toDateString() !== now.toDateString() && now - built > 6 * 3600 * 1000;
+  })();
+
+  const fillable = TOPICS.filter((tp) => (counts[tp.id] || 0) > 0).map((tp) => tp.id);
+  const allSelected = fillable.length > 0 && fillable.every((id) => topics.includes(id));
+  const toggleAll = () => setTopics(allSelected ? [] : fillable);
 
   const toggleTopic = (id) =>
     setTopics((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -490,8 +514,25 @@ export default function Feekah() {
 
         {/* ---------- Topics ---------- */}
         <section className="mt-7">
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".14em", color: C.soft }}>
-            {t.pick.toUpperCase()}
+          <div className="flex items-center justify-between gap-3">
+            <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".14em", color: C.soft }}>
+              {t.pick.toUpperCase()}
+            </div>
+            {/* Selects only topics that actually have stories — offering to
+                select an empty chip would just re-create the disabled state. */}
+            {edition && (
+              <button
+                onClick={toggleAll}
+                className="dl-focus px-2.5 py-1 rounded-full shrink-0"
+                style={{
+                  fontFamily: MONO, fontSize: 11,
+                  background: "transparent", color: C.soft,
+                  border: `1px solid ${C.sky}`,
+                }}
+              >
+                {allSelected ? t.clearAll : t.selectAll}
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap gap-2 mt-3">
             {TOPICS.map((tp) => {
@@ -558,20 +599,26 @@ export default function Feekah() {
             </div>
           )}
 
-          <button
-            onClick={load}
-            disabled={status === "loading" || !topics.length}
-            className="dl-focus mt-4 w-full rounded-2xl py-3"
-            style={{
-              fontFamily: DISPLAY, fontWeight: 700, fontSize: 16,
-              background: topics.length ? C.ink : "#C9D4D3",
-              color: C.paper, opacity: status === "loading" ? 0.6 : 1,
-            }}
-          >
-            {status === "loading" ? t.loading : stories.length ? t.reload : t.load}
-          </button>
+          {/* The old "hent på nytt" button is gone. It was AI machinery: each
+              press fired a fresh web search, so "get new stories" was true.
+              Against a static daily edition it re-fetched the same file and
+              handed back identical stories — a control that promised something
+              it could no longer do. The edition loads on open and the chips
+              filter on-device, so there is nothing left for it to trigger.
+
+              What IS worth offering is a reload when the edition on screen is
+              genuinely out of date — a tab left open overnight. */}
+          {staleEdition && (
+            <button
+              onClick={() => window.location.reload()}
+              className="dl-focus mt-4 w-full rounded-2xl py-3"
+              style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 16, background: C.ink, color: C.paper }}
+            >
+              {t.newEdition}
+            </button>
+          )}
           {!topics.length && (
-            <p style={{ fontSize: 14, color: C.soft, marginTop: 8 }}>{t.emptyTopics}</p>
+            <p style={{ fontSize: 14, color: C.soft, marginTop: 12 }}>{t.emptyTopics}</p>
           )}
         </section>
 

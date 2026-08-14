@@ -1,0 +1,17 @@
+{
+  "name": "feekah",
+  "short_name": "feekah",
+  "description": "Gode nyheter til kaffekoppen. Ingen politikk, ingen reklame.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#EDF1F2",
+  "theme_color": "#EDF1F2",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

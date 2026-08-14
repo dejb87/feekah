@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- feekah: the sun rising out of the hills, same palette as the app.
+       Drawn large and simple — a favicon is rendered at 16px, so the arc and
+       the glow have to read at a glance or they turn to mud. -->
+  <rect width="64" height="64" rx="14" fill="#EDF1F2"/>
+  <circle cx="32" cy="34" r="17" fill="#E8A33D" opacity="0.20"/>
+  <circle cx="32" cy="34" r="10" fill="#E8A33D"/>
+  <path d="M0,64 L0,44 Q14,32 28,42 T44,40 Q56,36 64,46 L64,64 Z" fill="#16302C"/>
+</svg>
