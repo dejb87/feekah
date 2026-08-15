@@ -51,6 +51,36 @@ function tidySummary(s) {
   return (lastSpace > 0 ? window.slice(0, lastSpace) : window).replace(/[,;:—–-]$/, "") + "…";
 }
 
+const IMAGE_MAX_BYTES = 1_200_000;
+
+/**
+ * Publishers syndicate whatever they have, unresized. One Natursidan image
+ * measured 4 MB — a single card costing more than the rest of the page put
+ * together, on a phone, for a reader who wanted a quick calm break. Check
+ * cheaply at build time (HEAD, in CI, once a day) and drop the offenders
+ * rather than making every reader pay to discover them.
+ */
+async function verifyImages(stories) {
+  const withImages = stories.filter((s) => s.image);
+  let dropped = 0;
+  const BATCH = 8;
+  for (let i = 0; i < withImages.length; i += BATCH) {
+    await Promise.all(withImages.slice(i, i + BATCH).map(async (s) => {
+      try {
+        const r = await fetch(s.image, { method: "HEAD", signal: AbortSignal.timeout(8000), redirect: "follow" });
+        const type = r.headers.get("content-type") || "";
+        const size = Number(r.headers.get("content-length") || 0);
+        if (!r.ok || !type.startsWith("image/") || size > IMAGE_MAX_BYTES) {
+          s.image = ""; dropped++;
+        }
+      } catch {
+        s.image = ""; dropped++;   // unreachable now means broken in a browser too
+      }
+    }));
+  }
+  return { checked: withImages.length, dropped };
+}
+
 const buildStamp = new Date().toISOString();
 const maxPerTopic = cfg._policy?.maxPerTopic ?? 8;
 let totalItems = 0;
@@ -85,6 +115,7 @@ for (const [lang, L] of Object.entries(cfg)) {
         topic: i.topic,
         source: i.source,
         url: i.link,
+        image: i.image || "",
         date: isoDate(i.date),
         tier: i.tier,
       });
@@ -121,6 +152,8 @@ for (const [lang, L] of Object.entries(cfg)) {
     return n <= maxPerTopic;
   });
 
+  const img = await verifyImages(woven);
+
   const edition = {
     lang,
     label: L.label,
@@ -138,7 +171,9 @@ for (const [lang, L] of Object.entries(cfg)) {
   totalItems += woven.length;
   console.log(
     `${lang}: ${woven.length} stories (${edition.withSummary} with summary, ` +
-    `${woven.length - edition.withSummary} title-only)` +
+    `${woven.length - edition.withSummary} title-only) · ` +
+    `${woven.filter((s) => s.image).length} with image` +
+    (img.dropped ? ` (${img.dropped} of ${img.checked} dropped: too large, broken or not an image)` : "") +
     (problems.length ? ` · ${problems.length} source(s) failed` : "")
   );
 }

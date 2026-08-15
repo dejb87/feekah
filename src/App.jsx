@@ -713,9 +713,28 @@ export default function Feekah() {
             return (
               <article
                 key={s.id}
-                className={`dl-card rounded-2xl ${brief ? "p-4" : "p-5"}`}
+                className="dl-card rounded-2xl overflow-hidden"
                 style={{ background: C.card }}
               >
+                {/* Roughly half of any edition has an image — ScienceDaily,
+                    Good News Network, Positive News and every SVT feed publish
+                    none at all — so the card must read as deliberate either way,
+                    never as one with a hole where a picture should be.
+                    aspect-ratio reserves the space before the image arrives, so
+                    nothing jumps as you scroll; lazy loading means only the
+                    cards you actually reach cost anything. */}
+                {s.image && (
+                  <img
+                    src={s.image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full block"
+                    style={{ aspectRatio: "16 / 9", objectFit: "cover", background: C.sky }}
+                    onError={(e) => { e.currentTarget.style.display = "none"; }}
+                  />
+                )}
+                <div className={brief ? "p-4" : "p-5"}>
                 <div className="flex items-center gap-2" style={{ fontFamily: MONO, fontSize: 11, color: C.moss }}>
                   <span>{String(i + 1).padStart(2, "0")}</span>
                   <span style={{ color: "#C3D0D2" }}>/</span>
@@ -771,6 +790,7 @@ export default function Feekah() {
                   {s.date && (
                     <span style={{ fontFamily: MONO, fontSize: 11, color: "#9AAEAD" }}>{s.date}</span>
                   )}
+                </div>
                 </div>
               </article>
             );
