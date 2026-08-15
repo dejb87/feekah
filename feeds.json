@@ -9,7 +9,8 @@
     "dedup": "The validator drops cross-source duplicates within each edition, by normalised title and by canonical URL. VG and Aftenposten are both Schibsted and genuinely do run the same story.",
     "matchMode": "'substring' for Norwegian and Swedish, 'word' for English. Norwegian and Swedish compound their nouns, so a blocked stem often sits at the END of a word — 'tarmkreft', 'brannvesen', 'riksdagsval' — and word-boundary matching sails straight past it. English does not compound and needs the boundary, or 'dead' swallows 'deadline'. The cost of substring mode is that short stems collide: bare 'val' in Swedish matches val (whale), valp, valross and kvalitet, so the lists below use 'riksdagsval' and 'valrörelse' instead. Keep NO/SV entries at four characters or more and check them against a compound before adding.",
     "topicRules": "Topic per ITEM, not per source. Matched as whole tokens against the item's categories AND the first segment of its URL, which on Labrador sites (forskning.no, ung.forskning.no, sciencenorway.no) is the article's hyphen-joined tag list — those three publish no <category> at all, so the slug is the only signal they give. Whole-token matching matters: substring matching would let 'mat' (food) match 'matematikk'. FIRST MATCH WINS, so order is meaningful and deliberately not alphabetical — 'family' sits above 'nature' so a story tagged barn-og-ungdom-klima-mat reads as family rather than climate, and 'science' sits near the bottom so a science site's archaeology piece lands in culture instead of defaulting back to science. Anything matching nothing falls back to the source's own topic.",
-    "wonder": "The 'wonder' topic replaced 'humor'. There is no reliable warm-funny news feed in ANY of the three languages — UPI's Odd News wire, the closest thing to one, led with a teenager's death the day it was probed, and Norwegian and Swedish have nothing at all. Comedy in feekah lives in the dad-joke card instead, which is curated in src/jokes.json and entirely under your control. This chip covers what the sources genuinely deliver: the odd, the record-breaking and the delightful. Its rules run FIRST but deliberately contain only oddity markers (rart, udda, unusual, mystery, record) and NOT broad topic nouns — putting 'arkeologi' here would strip every archaeology story out of culture rather than catching the overflow."
+    "wonder": "The 'wonder' topic replaced 'humor'. There is no reliable warm-funny news feed in ANY of the three languages — UPI's Odd News wire, the closest thing to one, led with a teenager's death the day it was probed, and Norwegian and Swedish have nothing at all. Comedy in feekah lives in the dad-joke card instead, which is curated in src/jokes.json and entirely under your control. This chip covers what the sources genuinely deliver: the odd, the record-breaking and the delightful. Its rules run FIRST but deliberately contain only oddity markers (rart, udda, unusual, mystery, record) and NOT broad topic nouns — putting 'arkeologi' here would strip every archaeology story out of culture rather than catching the overflow.",
+    "sectionAllow": "Tier 2 only, and the mirror of categoryAllow for publishers that ship no categories. ONLY TOPICAL SECTIONS BELONG HERE — /kultur/, /livsstil/, /vetenskap-tech/. Geographic sections must never be listed, for exactly the reason topic nouns are banned from 'require': a municipality section says WHERE a story happened, not whether it is good news. Measured: gating on /lokalt/, /vasa/ and /narpes/ admitted 'fler rattfyllerifall', 'Båt tog in vatten – räddningsverket ryckte ut' and 'ekonomisk katastrof' next to the school-garden prize. /kultur/ and /vetenskap-tech/ admitted 'Småbarn vaknar oftare än föräldrar tror'."
   },
   "no": {
     "label": "Norsk",
@@ -464,6 +465,84 @@
         "topic": "culture",
         "tier": 2,
         "status": "ok"
+      },
+      {
+        "id": "yle-osterbotten",
+        "name": "Svenska Yle Österbotten",
+        "url": "https://svenska.yle.fi/rss/osterbotten",
+        "topic": "kindness",
+        "tier": 2,
+        "status": "unverified",
+        "note": "Finland-Swedish public service for Ostrobothnia. Free, no paywall, and the ONLY new Swedish-language source that tags its items (Konst, Fotografer, Tävlingar, Österbotten), so per-item topics and the categoryAllow gate both work on it. No images in the feed."
+      },
+      {
+        "id": "yle-senaste",
+        "name": "Svenska Yle",
+        "url": "https://svenska.yle.fi/rss/senaste-nytt",
+        "topic": "kindness",
+        "tier": 2,
+        "status": "unverified",
+        "note": "Svenska Yle's general feed. Overlaps Österbotten — dedup handles it. Also tagged, also free."
+      },
+      {
+        "id": "vasabladet",
+        "name": "Vasabladet",
+        "url": "https://www.vasabladet.fi/rss",
+        "topic": "family",
+        "tier": 2,
+        "status": "unverified",
+        "sectionBlock": [
+          "utrikes",
+          "opinion",
+          "sport"
+        ],
+        "note": "Vasa's paper, 50 items and 48 with images. No categories, but the URL carries the section: utrikes(11) vasa(8) sport(7) opinion(4) inrikes(4) kultur(3) livsstil(2). HSS Media, so some articles sit behind a wall the RSS does not mark — same unfixable situation as Aftenposten. Its sections are also used as a POSITIVE signal (sectionAllow) — with no categories to gate on, a culture or local-news section is better evidence than hoping the headline contains an action verb.",
+        "sectionAllow": [
+          "kultur",
+          "livsstil",
+          "vetenskap-tech"
+        ]
+      },
+      {
+        "id": "osterbottens-tidning",
+        "name": "Österbottens Tidning",
+        "url": "https://www.ot.fi/rss",
+        "topic": "kindness",
+        "tier": 2,
+        "status": "unverified",
+        "sectionBlock": [
+          "utrikes",
+          "opinion",
+          "sport",
+          "blaljus-och-brott"
+        ],
+        "note": "Jakobstad region. 49 of 50 items carry images. 'blaljus-och-brott' is literally the emergency-services-and-crime section, so it is blocked by name. Its sections are also used as a POSITIVE signal (sectionAllow) — with no categories to gate on, a culture or local-news section is better evidence than hoping the headline contains an action verb.",
+        "sectionAllow": [
+          "kultur"
+        ]
+      },
+      {
+        "id": "syd-osterbotten",
+        "name": "Syd-Österbotten",
+        "url": "https://www.sydin.fi/rss",
+        "topic": "kindness",
+        "tier": 2,
+        "status": "unverified",
+        "sectionBlock": [
+          "ekonomi",
+          "sport",
+          "opinion"
+        ],
+        "note": "Närpes, Kristinestad, Kaskö, Korsnäs. All 50 items carry images. NO sectionAllow: its sections are municipalities, not subjects, and geography carries no tone — gating on them admitted drink-driving figures and a boat rescue alongside the school news. It therefore relies on the keyword gate and contributes little. That is correct."
+      },
+      {
+        "id": "nya-aland",
+        "name": "Nya Åland",
+        "url": "https://www.nyan.ax/rss",
+        "topic": "kindness",
+        "tier": 2,
+        "status": "unverified",
+        "note": "Åland. Tagged and fully illustrated. Included because Åland is Swedish-speaking and the SV edition needs the volume."
       }
     ],
     "block": [
@@ -511,6 +590,66 @@
     "allow": [
       "hjärtattack",
       "brinner för"
+    ],
+    "categoryBlock": [
+      "polis",
+      "brott",
+      "kriminalitet",
+      "rättegång",
+      "olycka",
+      "olyckor",
+      "viltolycka",
+      "krig",
+      "politik",
+      "riksdagsval",
+      "utrikes",
+      "trafik",
+      "vägtrafik",
+      "dödsfall",
+      "brand",
+      "åtal",
+      "domstol",
+      "krock"
+    ],
+    "categoryAllow": [
+      "kultur",
+      "konst",
+      "fotokonst",
+      "fotograf",
+      "fotografi",
+      "fotografier",
+      "bilder",
+      "musik",
+      "konserter",
+      "festival",
+      "festivaler",
+      "litteratur",
+      "böcker",
+      "teater",
+      "natur",
+      "djur",
+      "djurliv",
+      "fåglar",
+      "trädgård",
+      "mat",
+      "forskning",
+      "vetenskap",
+      "historia",
+      "arkeologi",
+      "museum",
+      "hantverk",
+      "tävlingar",
+      "friluftsliv",
+      "resor",
+      "turism",
+      "barn",
+      "familjer",
+      "skolor",
+      "elever",
+      "utbildning",
+      "gymnasiet",
+      "hälsa",
+      "motion"
     ],
     "require": [
       "hjälper",
@@ -975,9 +1114,9 @@
       "Local paper for your own kommune"
     ],
     "sv": [
-      "Humour/odd news in Swedish",
-      "Health (SVT or Sveriges Radio)",
-      "Family & parenting"
+      "Family & parenting in Swedish",
+      "Wonder/oddities in Swedish",
+      "More Finland-Swedish: Åbo Underrättelser has no working feed"
     ],
     "en": [
       "Family & parenting",
@@ -990,7 +1129,10 @@
       "sverigesnatur.org": "Alive, but it is an advocacy organisation and runs political campaigning ('Liberalerna blåljuger om klimatet'). SV nature is already full from Natursidan.",
       "upi.com Odd News": "Alive with 25 items, but 'odd' includes deaths — the top item was a teenager's death. Confirms that odd-news wires are not warm-news wires.",
       "dagbladet.no, bt.no, aftenposten A-magasinet": "All alive (Dagbladet is another Labrador site, ?lab_viewport=rss). All tabloid or paywalled general news; would need tier 2 with no metadata to gate on.",
-      "dead": "mabra.com, viforaldrar.se, land.se, illvet.se, allas.se, expressen leva-och-bo, sunnyskyz.com, nrk.no/mat — all 404/406."
+      "dead": "mabra.com, viforaldrar.se, land.se, illvet.se, allas.se, expressen leva-och-bo, sunnyskyz.com, nrk.no/mat — all 404/406.",
+      "hbl.fi": "Alive, 50 items, all illustrated — but Helsinki rather than Ostrobothnia, heavily subscription-based, and its front page is dominated by war coverage. Skipped.",
+      "jt.fi": "NOT Jakobstads Tidning. The feed returns Finnish-language B2B packaging trade news (PPWR, rekry). Wrong site — do not add on the strength of the domain name.",
+      "abounderrattelser.fi, kyrkpressen.fi, alandstidningen.ax": "0 items or 404."
     }
   },
   "_policy": {

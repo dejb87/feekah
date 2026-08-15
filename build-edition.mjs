@@ -54,6 +54,57 @@ function tidySummary(s) {
 const IMAGE_MAX_BYTES = 1_200_000;
 
 /**
+ * Many publishers ship no image in RSS at all — ScienceDaily's items carry five
+ * fields and nothing else, and Good News Network, Positive News and every SVT
+ * feed are the same. Those articles do have a picture; it just isn't syndicated.
+ *
+ * The article page advertises it in an og:image meta tag, which exists for
+ * precisely this purpose: so a link shows a picture when it's shared. Reading
+ * that one tag is not scraping the article — we take the meta tag and nothing
+ * else, and still link out for the story itself.
+ *
+ * Costs one request per imageless story, once a day, in CI. Readers pay nothing:
+ * the result is baked into the static edition.
+ */
+async function fetchOgImage(pageUrl) {
+  try {
+    const res = await fetch(pageUrl, {
+      headers: { "User-Agent": "feekah/1.0 (+https://feekah.no) link preview" },
+      signal: AbortSignal.timeout(10000),
+      redirect: "follow",
+    });
+    if (!res.ok) return "";
+    // Meta tags live in <head>; no need to read a whole article to find them.
+    const head = (await res.text()).slice(0, 200_000);
+    const patterns = [
+      /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,
+      /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+    ];
+    for (const re of patterns) {
+      const m = head.match(re);
+      if (!m) continue;
+      const url = m[1].replace(/&amp;/g, "&").trim();
+      if (/^https?:\/\//i.test(url)) return url;
+    }
+  } catch { /* unreachable or too slow — the card simply has no image */ }
+  return "";
+}
+
+async function backfillImages(stories) {
+  const missing = stories.filter((s) => !s.image && s.url);
+  let found = 0;
+  const BATCH = 6;   // polite: never more than six open connections at once
+  for (let i = 0; i < missing.length; i += BATCH) {
+    await Promise.all(missing.slice(i, i + BATCH).map(async (s) => {
+      const img = await fetchOgImage(s.url);
+      if (img) { s.image = img; found++; }
+    }));
+  }
+  return { attempted: missing.length, found };
+}
+
+/**
  * Publishers syndicate whatever they have, unresized. One Natursidan image
  * measured 4 MB — a single card costing more than the rest of the page put
  * together, on a phone, for a reader who wanted a quick calm break. Check
@@ -152,6 +203,8 @@ for (const [lang, L] of Object.entries(cfg)) {
     return n <= maxPerTopic;
   });
 
+  // Backfill first, then verify everything — an og:image can be oversized too.
+  const back = await backfillImages(woven);
   const img = await verifyImages(woven);
 
   const edition = {
@@ -173,7 +226,8 @@ for (const [lang, L] of Object.entries(cfg)) {
     `${lang}: ${woven.length} stories (${edition.withSummary} with summary, ` +
     `${woven.length - edition.withSummary} title-only) · ` +
     `${woven.filter((s) => s.image).length} with image` +
-    (img.dropped ? ` (${img.dropped} of ${img.checked} dropped: too large, broken or not an image)` : "") +
+    (back.attempted ? ` (+${back.found} of ${back.attempted} from og:image)` : "") +
+    (img.dropped ? ` (−${img.dropped} dropped: too large, broken or not an image)` : "") +
     (problems.length ? ` · ${problems.length} source(s) failed` : "")
   );
 }
