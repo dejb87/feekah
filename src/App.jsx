@@ -24,8 +24,9 @@ const FONT_URL =
    never ships a placeholder address — an unreachable contact is worse than
    none, both for readers and for the URL-categorisation reviewers who look for
    a real human behind a new domain. */
-const OWNER = "Et privat prosjekt fra Norge";
+const OWNER = "Åpent prosjekt fra Norge";
 const CONTACT = "finnswede@rngd.no";
+const REPO = "https://github.com/dejb87/feekah";
 
 const DISPLAY = "'Bricolage Grotesque', system-ui, sans-serif";
 const BODY = "'Newsreader', Georgia, serif";
@@ -78,6 +79,7 @@ const T = {
     aboutBody: "feekah samler dagens gode nyheter fra kilder som allerede skriver om det som går bra. Ingen politikk, ingen reklame, ingen sporing, og ingen uendelig scrolling — du blir ferdig, og så er dagen din. Utgaven bygges én gang i døgnet og er den samme for alle som åpner den den morgenen.",
     aboutSources: "Kilder i denne utgaven",
     aboutCredit: "Overskrifter og ingresser vises slik avisene selv publiserer dem i sine RSS-strømmer. Vi henter aldri hele artikler — trykk deg videre til avisen for å lese saken.",
+    aboutMade: "Bygget med Claude som kodehjelp — men appen selv bruker ingen KI. Åpen kode:",
     aboutContact: "Kontakt",
   },
   sv: {
@@ -107,6 +109,7 @@ const T = {
     aboutBody: "feekah samlar dagens goda nyheter från källor som redan skriver om det som går bra. Ingen politik, ingen reklam, ingen spårning och ingen oändlig scrollning — du blir klar, och sedan är dagen din. Utgåvan byggs en gång i dygnet och är densamma för alla som öppnar den den morgonen.",
     aboutSources: "Källor i denna utgåva",
     aboutCredit: "Rubriker och ingresser visas så som tidningarna själva publicerar dem i sina RSS-flöden. Vi hämtar aldrig hela artiklar — klicka vidare till tidningen för att läsa den.",
+    aboutMade: "Byggd med Claude som kodhjälp — men appen själv använder ingen AI. Öppen kod:",
     aboutContact: "Kontakt",
   },
   en: {
@@ -136,6 +139,7 @@ const T = {
     aboutBody: "feekah gathers the day's good news from outlets that already write about what is going well. No politics, no advertising, no tracking, and no infinite scroll — you finish, and then the day is yours. The edition is built once every 24 hours and is the same for everyone who opens it that morning.",
     aboutSources: "Sources in this edition",
     aboutCredit: "Headlines and summaries appear exactly as the publishers syndicate them in their own RSS feeds. We never fetch whole articles — follow the link to read the story at the source.",
+    aboutMade: "Built with Claude as a coding assistant — but the app itself uses no AI. Open source:",
     aboutContact: "Contact",
   },
 };
@@ -932,6 +936,19 @@ export default function Feekah() {
                 </p>
 
                 <p style={{ marginTop: 14, color: "#9AAEAD" }}>
+                  {t.aboutMade}{" "}
+                  <a
+                    href={REPO}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="dl-focus"
+                    style={{ color: C.soft, textDecoration: "underline" }}
+                  >
+                    github.com/dejb87/feekah
+                  </a>
+                </p>
+
+                <p style={{ marginTop: 10, color: "#9AAEAD" }}>
                   {OWNER}
                   {CONTACT && (
                     <>
