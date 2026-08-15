@@ -1,36 +1,189 @@
 {
-  "_readme": "Static dad jokes, rotated daily by the app. Written natively per language, never translated — a pun built on Norwegian wordplay dies the moment you move it into English. Add your own freely; the app picks a starting joke from the date, so a longer list means a longer time before anyone sees a repeat. Keep them clean and child-safe: nothing about politics, religion, or anyone's appearance.",
-
+  "_readme": "Static dad jokes. Written natively per language, never translated — a pun built on Norwegian wordplay dies the moment you move it into English. The app draws from a SHUFFLE BAG: it remembers which jokes have already come up (in localStorage) and draws only from the rest, so every joke appears once before any repeats and you never get the same one twice running. Add freely — a longer list simply means longer before the bag refills. Keep them clean and child-safe: nothing about politics, religion, or anyone's appearance, and check you are not reusing a punchline that is already in the list.",
   "no": [
-    { "setup": "Kva kallar du ein bumerang som ikkje kjem tilbake?", "punchline": "Ein pinne." },
-    { "setup": "Hvorfor er fisker så flinke til å veie seg?", "punchline": "De har sin egen skala." },
-    { "setup": "Hva er det beste med å bo i Bergen?", "punchline": "Du vasker aldri bilen forgjeves." },
-    { "setup": "Hvorfor tok Ole med seg stigen på jobb?", "punchline": "Han skulle jobbe på et høyere nivå." },
-    { "setup": "Hva sa det ene vindet til det andre?", "punchline": "Ingenting. Det bare blåste i det." },
-    { "setup": "Hvorfor ble kaka lei seg?", "punchline": "Den følte seg helt smuldret opp." },
-    { "setup": "Hva kaller du en snømann om sommeren?", "punchline": "En dam med god selvtillit." },
-    { "setup": "Hvorfor gikk klokka til legen?", "punchline": "Den hadde vondt i visere." }
+    {
+      "setup": "Kva kallar du ein bumerang som ikkje kjem tilbake?",
+      "punchline": "Ein pinne."
+    },
+    {
+      "setup": "Hvorfor er fisker så flinke til å veie seg?",
+      "punchline": "De har sin egen skala."
+    },
+    {
+      "setup": "Hva er det beste med å bo i Bergen?",
+      "punchline": "Du vasker aldri bilen forgjeves."
+    },
+    {
+      "setup": "Hvorfor tok Ole med seg stigen på jobb?",
+      "punchline": "Han skulle jobbe på et høyere nivå."
+    },
+    {
+      "setup": "Hva sa det ene vindet til det andre?",
+      "punchline": "Ingenting. Det bare blåste i det."
+    },
+    {
+      "setup": "Hvorfor ble kaka lei seg?",
+      "punchline": "Den følte seg helt smuldret opp."
+    },
+    {
+      "setup": "Hva kaller du en snømann om sommeren?",
+      "punchline": "En dam med god selvtillit."
+    },
+    {
+      "setup": "Hvorfor gikk klokka til legen?",
+      "punchline": "Den hadde vondt i visere."
+    },
+    {
+      "setup": "Kva gjer ein fisk som er redd?",
+      "punchline": "Han blir heilt stiv i finnene."
+    },
+    {
+      "setup": "Hvorfor tar ikke bananer sol?",
+      "punchline": "De skreller seg allerede."
+    },
+    {
+      "setup": "Hva sa den ene tannen til den andre?",
+      "punchline": "Tannlegen kommer, hold tett!"
+    },
+    {
+      "setup": "Hvorfor er det ingen som spiller kort i jungelen?",
+      "punchline": "Det er for mange geparder."
+    },
+    {
+      "setup": "Hva kaller du en okse som sover?",
+      "punchline": "En bulldoser."
+    },
+    {
+      "setup": "Hvorfor ble bonden årets nabo?",
+      "punchline": "Han var enestående på sitt jorde."
+    },
+    {
+      "setup": "Kva heiter verdas raskaste grønsak?",
+      "punchline": "Ein springkål."
+    }
   ],
-
   "sv": [
-    { "setup": "Vad kallar man en bumerang som inte kommer tillbaka?", "punchline": "En pinne." },
-    { "setup": "Varför är fiskar så bra på att väga sig?", "punchline": "De har egna vågar." },
-    { "setup": "Varför gick tomaten och la sig?", "punchline": "Den var helt mosad." },
-    { "setup": "Vad sa den ena väggen till den andra?", "punchline": "Vi ses i hörnet!" },
-    { "setup": "Varför tog Kalle med sig stegen till jobbet?", "punchline": "Han skulle jobba på en högre nivå." },
-    { "setup": "Vad kallar man en björn utan öron?", "punchline": "B." },
-    { "setup": "Varför blev brödet ledsen?", "punchline": "Det kände sig lite skivat." },
-    { "setup": "Vad gör en ko när solen går ner?", "punchline": "Den blir mörkrädd — den ser inte en flen." }
+    {
+      "setup": "Vad kallar man en bumerang som inte kommer tillbaka?",
+      "punchline": "En pinne."
+    },
+    {
+      "setup": "Varför är fiskar så bra på att väga sig?",
+      "punchline": "De har egna vågar."
+    },
+    {
+      "setup": "Varför gick tomaten och la sig?",
+      "punchline": "Den var helt mosad."
+    },
+    {
+      "setup": "Vad sa den ena väggen till den andra?",
+      "punchline": "Vi ses i hörnet!"
+    },
+    {
+      "setup": "Varför tog Kalle med sig stegen till jobbet?",
+      "punchline": "Han skulle jobba på en högre nivå."
+    },
+    {
+      "setup": "Vad kallar man en björn utan öron?",
+      "punchline": "B."
+    },
+    {
+      "setup": "Varför blev brödet ledsen?",
+      "punchline": "Det kände sig lite skivat."
+    },
+    {
+      "setup": "Vad gör en ko när solen går ner?",
+      "punchline": "Den blir mörkrädd — den ser inte en flen."
+    },
+    {
+      "setup": "Vad gör en fisk som är rädd?",
+      "punchline": "Den blir alldeles stel i fenorna."
+    },
+    {
+      "setup": "Varför solar aldrig bananer?",
+      "punchline": "De skalar sig ändå."
+    },
+    {
+      "setup": "Vad sa den ena tanden till den andra?",
+      "punchline": "Tandläkaren kommer, håll tätt!"
+    },
+    {
+      "setup": "Varför spelar ingen kort i djungeln?",
+      "punchline": "Det är för många geparder."
+    },
+    {
+      "setup": "Vad kallar man en tjur som sover?",
+      "punchline": "En bulldozer."
+    },
+    {
+      "setup": "Varför blev bonden årets granne?",
+      "punchline": "Han var enastående på sin åker."
+    },
+    {
+      "setup": "Vad är en snögubbes favoritmat?",
+      "punchline": "Isbergssallad."
+    }
   ],
-
   "en": [
-    { "setup": "What do you call a boomerang that doesn't come back?", "punchline": "A stick." },
-    { "setup": "Why did the scarecrow win an award?", "punchline": "He was outstanding in his field." },
-    { "setup": "I only know 25 letters of the alphabet.", "punchline": "I don't know y." },
-    { "setup": "What do you call cheese that isn't yours?", "punchline": "Nacho cheese." },
-    { "setup": "How do you organise a party in space?", "punchline": "You planet." },
-    { "setup": "Why don't skeletons ever fight each other?", "punchline": "They don't have the guts." },
-    { "setup": "What did the ocean say to the shore?", "punchline": "Nothing. It just waved." },
-    { "setup": "Why did the bicycle fall over?", "punchline": "It was two tired." }
+    {
+      "setup": "What do you call a boomerang that doesn't come back?",
+      "punchline": "A stick."
+    },
+    {
+      "setup": "Why did the scarecrow win an award?",
+      "punchline": "He was outstanding in his field."
+    },
+    {
+      "setup": "I only know 25 letters of the alphabet.",
+      "punchline": "I don't know y."
+    },
+    {
+      "setup": "What do you call cheese that isn't yours?",
+      "punchline": "Nacho cheese."
+    },
+    {
+      "setup": "How do you organise a party in space?",
+      "punchline": "You planet."
+    },
+    {
+      "setup": "Why don't skeletons ever fight each other?",
+      "punchline": "They don't have the guts."
+    },
+    {
+      "setup": "What did the ocean say to the shore?",
+      "punchline": "Nothing. It just waved."
+    },
+    {
+      "setup": "Why did the bicycle fall over?",
+      "punchline": "It was two tired."
+    },
+    {
+      "setup": "What does a fish do when it's frightened?",
+      "punchline": "It goes stiff in the fins."
+    },
+    {
+      "setup": "Why don't bananas ever sunbathe?",
+      "punchline": "They peel anyway."
+    },
+    {
+      "setup": "What did one tooth say to the other?",
+      "punchline": "The dentist's coming — keep it shut."
+    },
+    {
+      "setup": "Why does nobody play cards in the jungle?",
+      "punchline": "Too many cheetahs."
+    },
+    {
+      "setup": "What do you call a sleeping bull?",
+      "punchline": "A bulldozer."
+    },
+    {
+      "setup": "What's a snowman's favourite lunch?",
+      "punchline": "Iceberg lettuce."
+    },
+    {
+      "setup": "Why did the farmer get a medal?",
+      "punchline": "For being the best in his field of work."
+    }
   ]
 }

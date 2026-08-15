@@ -472,7 +472,7 @@
         "url": "https://svenska.yle.fi/rss/osterbotten",
         "topic": "kindness",
         "tier": 2,
-        "status": "unverified",
+        "status": "ok",
         "note": "Finland-Swedish public service for Ostrobothnia. Free, no paywall, and the ONLY new Swedish-language source that tags its items (Konst, Fotografer, Tävlingar, Österbotten), so per-item topics and the categoryAllow gate both work on it. No images in the feed."
       },
       {
@@ -481,7 +481,7 @@
         "url": "https://svenska.yle.fi/rss/senaste-nytt",
         "topic": "kindness",
         "tier": 2,
-        "status": "unverified",
+        "status": "ok",
         "note": "Svenska Yle's general feed. Overlaps Österbotten — dedup handles it. Also tagged, also free."
       },
       {
@@ -490,7 +490,7 @@
         "url": "https://www.vasabladet.fi/rss",
         "topic": "family",
         "tier": 2,
-        "status": "unverified",
+        "status": "ok",
         "sectionBlock": [
           "utrikes",
           "opinion",
@@ -509,7 +509,7 @@
         "url": "https://www.ot.fi/rss",
         "topic": "kindness",
         "tier": 2,
-        "status": "unverified",
+        "status": "ok",
         "sectionBlock": [
           "utrikes",
           "opinion",
@@ -527,7 +527,7 @@
         "url": "https://www.sydin.fi/rss",
         "topic": "kindness",
         "tier": 2,
-        "status": "unverified",
+        "status": "ok",
         "sectionBlock": [
           "ekonomi",
           "sport",
@@ -541,8 +541,26 @@
         "url": "https://www.nyan.ax/rss",
         "topic": "kindness",
         "tier": 2,
-        "status": "unverified",
+        "status": "ok",
         "note": "Åland. Tagged and fully illustrated. Included because Åland is Swedish-speaking and the SV edition needs the volume."
+      },
+      {
+        "id": "popular-historia",
+        "name": "Populär Historia",
+        "url": "https://popularhistoria.se/feed",
+        "topic": "culture",
+        "tier": 1,
+        "status": "ok",
+        "note": "Swedish history magazine, all items illustrated. Tier 1: a history magazine is pre-filtered by nature."
+      },
+      {
+        "id": "yle-kultur",
+        "name": "Svenska Yle Kultur",
+        "url": "https://svenska.yle.fi/rss/kultur",
+        "topic": "culture",
+        "tier": 2,
+        "status": "ok",
+        "note": "Finland-Swedish culture desk, tagged like the other Yle feeds so categoryAllow works on it."
       }
     ],
     "block": [
@@ -1132,7 +1150,8 @@
       "dead": "mabra.com, viforaldrar.se, land.se, illvet.se, allas.se, expressen leva-och-bo, sunnyskyz.com, nrk.no/mat — all 404/406.",
       "hbl.fi": "Alive, 50 items, all illustrated — but Helsinki rather than Ostrobothnia, heavily subscription-based, and its front page is dominated by war coverage. Skipped.",
       "jt.fi": "NOT Jakobstads Tidning. The feed returns Finnish-language B2B packaging trade news (PPWR, rekry). Wrong site — do not add on the strength of the domain name.",
-      "abounderrattelser.fi, kyrkpressen.fi, alandstidningen.ax": "0 items or 404."
+      "abounderrattelser.fi, kyrkpressen.fi, alandstidningen.ax": "0 items or 404.",
+      "varldenshistoria.se, illvet.se, illvit.no, historienet.no, alltomvetenskap.se": "All 404 or 0 items. The Bonnier curiosity magazines have no working public feeds in either language — checked for both the wonder and culture gaps."
     }
   },
   "_policy": {

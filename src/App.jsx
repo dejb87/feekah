@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import JOKES from "./jokes.json";
+import FACTS from "./facts.json";
 
 /* ------------------------------------------------------------------
    feekah — a finite, ad-free coffee break of good news, ending on a laugh.
@@ -63,6 +64,7 @@ const T = {
     source: "Kilde",
     noResults: "Fant ingenting nytt akkurat nå. Prøv flere temaer.",
     jokeLabel: "DAGENS PAPPAVITS",
+    factLabel: "VISSTE DU AT",
     jokeReveal: "Vis svaret",
     jokeNext: "En til",
   },
@@ -86,6 +88,7 @@ const T = {
     source: "Källa",
     noResults: "Hittade inget nytt just nu. Prova fler ämnen.",
     jokeLabel: "DAGENS PAPPASKÄMT",
+    factLabel: "VISSTE DU ATT",
     jokeReveal: "Visa svaret",
     jokeNext: "En till",
   },
@@ -109,6 +112,7 @@ const T = {
     source: "Source",
     noResults: "Nothing new turned up. Try adding topics.",
     jokeLabel: "TODAY'S DAD JOKE",
+    factLabel: "DID YOU KNOW",
     jokeReveal: "Show the answer",
     jokeNext: "One more",
   },
@@ -130,12 +134,38 @@ async function fetchEdition(lang) {
   return data;
 }
 
-/** Same joke all day, a different one tomorrow — no randomness between reloads. */
-function jokeOffsetForToday(count) {
+/** The fact stays put all day — a "did you know" reads as today's, not a slot machine. */
+function offsetForToday(count) {
   if (!count) return 0;
   const d = new Date();
   const days = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
   return days % count;
+}
+
+/**
+ * Jokes are drawn from a shuffle bag, not picked at random.
+ *
+ * Plain Math.random() over N jokes repeats the one you just read about 1/N of
+ * the time, which is exactly what feels broken. Remembering which have already
+ * come up and drawing only from the rest guarantees you see every joke once
+ * before any repeats — and the bag empties and refills automatically. Persisted,
+ * so a refresh continues the sequence instead of restarting it.
+ */
+function drawJoke(lang, count) {
+  if (!count) return 0;
+  const key = `feekah:jokesSeen:${lang}`;
+  let seen = [];
+  try {
+    const raw = JSON.parse(localStorage.getItem(key) || "[]");
+    if (Array.isArray(raw)) seen = raw.filter((n) => Number.isInteger(n) && n < count);
+  } catch { /* storage disabled — every draw is simply independent */ }
+
+  let pool = Array.from({ length: count }, (_, i) => i).filter((i) => !seen.includes(i));
+  if (!pool.length) { seen = []; pool = Array.from({ length: count }, (_, i) => i); }
+
+  const idx = pool[Math.floor(Math.random() * pool.length)];
+  try { localStorage.setItem(key, JSON.stringify([...seen, idx])); } catch { /* ignore */ }
+  return idx;
 }
 
 /* -------------------------- Daylight -------------------------- */
@@ -456,13 +486,16 @@ export default function Feekah() {
   /* Jokes are a static file. Start from the date so the joke is stable all day
      but different tomorrow, then step through the list on "one more". */
   const jokes = JOKES[lang] || [];
+  // Same day-based pick as the joke: stable all day, different tomorrow.
+  const facts = FACTS[lang] || [];
+  const fact = facts[offsetForToday(facts.length)] || "";
   useEffect(() => {
-    setJokeIdx(jokeOffsetForToday((JOKES[lang] || []).length));
+    setJokeIdx(drawJoke(lang, (JOKES[lang] || []).length));
     setJokeShown(false);
   }, [lang]);
 
   const nextJoke = () => {
-    setJokeIdx((i) => (jokes.length ? (i + 1) % jokes.length : 0));
+    setJokeIdx(drawJoke(lang, jokes.length));
     setJokeShown(false);
   };
 
@@ -798,6 +831,25 @@ export default function Feekah() {
 
           {status === "done" && stories.length > 0 && (
             <>
+              {/* Fun facts are static and curated for the same reason the jokes
+                  are: nobody syndicates "did you know" as a feed, and feekah
+                  spends nothing at runtime. It also means the closing sequence
+                  works in every language regardless of what the publishers gave
+                  us that morning — Swedish has no oddities source at all. */}
+              {fact && (
+                <section
+                  className="rounded-2xl p-5 mt-8"
+                  style={{ background: C.card, borderLeft: `3px solid ${C.moss}` }}
+                >
+                  <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".16em", color: C.moss }}>
+                    {t.factLabel}
+                  </div>
+                  <p style={{ fontSize: 18, lineHeight: 1.5, marginTop: 10, color: "#2B4340" }}>
+                    {fact}
+                  </p>
+                </section>
+              )}
+
               {jokes.length > 0 && (
               <section className="rounded-2xl p-5 mt-8" style={{ background: C.amber }}>
                 <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".16em", color: "#5B4110" }}>

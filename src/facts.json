@@ -1,0 +1,42 @@
+{
+  "_readme": "Fun facts, rotated daily by the app alongside the dad joke. Static and curated for the same reason the jokes are: nobody syndicates 'did you know' as an RSS feed, and feekah consumes no AI at runtime. Written natively per language rather than translated. Keep them TRUE — an app whose whole promise is a calm, trustworthy read cannot deal in half-remembered trivia. Prefer facts that are easy to verify and pleasant to repeat at a dinner table. The app picks by date, so a longer list means longer before anyone sees a repeat.",
+
+  "no": [
+    "Honning blir aldri dårlig. Arkeologer har funnet krukker med spiselig honning i egyptiske graver, over 3000 år gamle.",
+    "En blekksprut har tre hjerter, og blodet er blått i stedet for rødt.",
+    "Lærdalstunnelen er verdens lengste veitunnel — 24,5 kilometer rett gjennom fjellet.",
+    "Bananer er bær. Jordbær er det ikke.",
+    "Utenfor Røst ligger verdens største kjente kaldtvannskorallrev.",
+    "Det finnes flere trær på jorda enn det er stjerner i Melkeveien.",
+    "Vombater bæsjer firkantet, så møkka ikke skal trille bort fra reviret.",
+    "En flokk flamingoer heter på engelsk «a flamboyance».",
+    "Havoter holder hverandre i hendene når de sover, så de ikke driver fra hverandre.",
+    "Island har hverken mygg eller jernbane."
+  ],
+
+  "sv": [
+    "Honung blir aldrig dålig. Arkeologer har hittat ätbar honung i egyptiska gravar, över 3000 år gammal.",
+    "En bläckfisk har tre hjärtan, och blodet är blått i stället för rött.",
+    "Bananer är bär. Jordgubbar är det inte.",
+    "Det finns fler träd på jorden än stjärnor i Vintergatan.",
+    "Vombater bajsar fyrkantigt, så att spillningen inte ska rulla i väg.",
+    "Havsuttrar håller varandra i handen när de sover, för att inte driva isär.",
+    "Island har varken myggor eller järnväg.",
+    "Sverige har omkring 100 000 sjöar större än ett hektar.",
+    "Näbbdjuret har ingen mage — matstrupen går rakt ner i tarmen.",
+    "Ett moln kan väga flera hundra ton, men flyter för att luften under är tyngre."
+  ],
+
+  "en": [
+    "Honey never spoils. Archaeologists have found edible honey in Egyptian tombs over 3,000 years old.",
+    "An octopus has three hearts, and its blood is blue rather than red.",
+    "Bananas are berries. Strawberries are not.",
+    "There are more trees on Earth than there are stars in the Milky Way.",
+    "Wombats produce cube-shaped droppings, so they don't roll away from where they're left.",
+    "Sea otters hold hands while sleeping so they don't drift apart.",
+    "Iceland has neither mosquitoes nor railways.",
+    "A group of flamingos is called a flamboyance.",
+    "The platypus has no stomach — its oesophagus runs straight into its intestine.",
+    "A cloud can weigh several hundred tonnes, and floats because the air beneath it is heavier still."
+  ]
+}
