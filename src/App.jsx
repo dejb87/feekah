@@ -20,6 +20,13 @@ const C = {
 const FONT_URL =
   "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=DM+Mono:wght@400;500&display=swap";
 
+/* Masthead details for the footer. CONTACT renders only when set, so the site
+   never ships a placeholder address — an unreachable contact is worse than
+   none, both for readers and for the URL-categorisation reviewers who look for
+   a real human behind a new domain. */
+const OWNER = "Et privat prosjekt fra Norge";
+const CONTACT = "finnswede@rngd.no";
+
 const DISPLAY = "'Bricolage Grotesque', system-ui, sans-serif";
 const BODY = "'Newsreader', Georgia, serif";
 const MONO = "'DM Mono', ui-monospace, monospace";
@@ -67,6 +74,11 @@ const T = {
     factLabel: "VISSTE DU AT",
     jokeReveal: "Vis svaret",
     jokeNext: "En til",
+    aboutTitle: "Om feekah",
+    aboutBody: "feekah samler dagens gode nyheter fra kilder som allerede skriver om det som går bra. Ingen politikk, ingen reklame, ingen sporing, og ingen uendelig scrolling — du blir ferdig, og så er dagen din. Utgaven bygges én gang i døgnet og er den samme for alle som åpner den den morgenen.",
+    aboutSources: "Kilder i denne utgaven",
+    aboutCredit: "Overskrifter og ingresser vises slik avisene selv publiserer dem i sine RSS-strømmer. Vi henter aldri hele artikler — trykk deg videre til avisen for å lese saken.",
+    aboutContact: "Kontakt",
   },
   sv: {
     eyebrow: "DAGENS FIKA",
@@ -91,6 +103,11 @@ const T = {
     factLabel: "VISSTE DU ATT",
     jokeReveal: "Visa svaret",
     jokeNext: "En till",
+    aboutTitle: "Om feekah",
+    aboutBody: "feekah samlar dagens goda nyheter från källor som redan skriver om det som går bra. Ingen politik, ingen reklam, ingen spårning och ingen oändlig scrollning — du blir klar, och sedan är dagen din. Utgåvan byggs en gång i dygnet och är densamma för alla som öppnar den den morgonen.",
+    aboutSources: "Källor i denna utgåva",
+    aboutCredit: "Rubriker och ingresser visas så som tidningarna själva publicerar dem i sina RSS-flöden. Vi hämtar aldrig hela artiklar — klicka vidare till tidningen för att läsa den.",
+    aboutContact: "Kontakt",
   },
   en: {
     eyebrow: "TODAY'S BREAK",
@@ -115,6 +132,11 @@ const T = {
     factLabel: "DID YOU KNOW",
     jokeReveal: "Show the answer",
     jokeNext: "One more",
+    aboutTitle: "About feekah",
+    aboutBody: "feekah gathers the day's good news from outlets that already write about what is going well. No politics, no advertising, no tracking, and no infinite scroll — you finish, and then the day is yours. The edition is built once every 24 hours and is the same for everyone who opens it that morning.",
+    aboutSources: "Sources in this edition",
+    aboutCredit: "Headlines and summaries appear exactly as the publishers syndicate them in their own RSS feeds. We never fetch whole articles — follow the link to read the story at the source.",
+    aboutContact: "Contact",
   },
 };
 
@@ -885,6 +907,43 @@ export default function Feekah() {
                 <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 20 }}>{t.end}</div>
                 <p style={{ color: C.soft, marginTop: 6, fontSize: 15 }}>{t.endSub}</p>
               </div>
+
+              {/* Deliberately at the very bottom and deliberately quiet — it is
+                  a masthead, not a feature. It exists so a reader (and a URL
+                  categorisation reviewer, who is often a person) can see who
+                  runs this, what it does with publishers' work, and how to get
+                  in touch. The source list is generated from the edition on
+                  screen, so it can never drift out of date. */}
+              <footer
+                className="mt-10 pt-6"
+                style={{ borderTop: `1px solid ${C.sky}`, fontSize: 13, lineHeight: 1.6, color: C.soft }}
+              >
+                <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".14em", color: C.moss }}>
+                  {t.aboutTitle.toUpperCase()}
+                </div>
+                <p style={{ marginTop: 8 }}>{t.aboutBody}</p>
+                <p style={{ marginTop: 10 }}>{t.aboutCredit}</p>
+
+                <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".06em", marginTop: 14, color: "#8AA0A0" }}>
+                  {t.aboutSources}
+                </div>
+                <p style={{ marginTop: 4, color: "#8AA0A0" }}>
+                  {[...new Set(available.map((s) => s.source))].sort().join(" · ")}
+                </p>
+
+                <p style={{ marginTop: 14, color: "#9AAEAD" }}>
+                  {OWNER}
+                  {CONTACT && (
+                    <>
+                      {" · "}
+                      {t.aboutContact}:{" "}
+                      <a href={`mailto:${CONTACT}`} className="dl-focus" style={{ color: C.soft, textDecoration: "underline" }}>
+                        {CONTACT}
+                      </a>
+                    </>
+                  )}
+                </p>
+              </footer>
             </>
           )}
         </main>
